@@ -7,6 +7,7 @@ find_package(OpenCV REQUIRED)
 add_executable(
     ${PROJECT_NAME}
     utils.hpp
+    utils.cpp
     rgb.hpp
     amy_xyz.cpp
     amy_xyz.cpp

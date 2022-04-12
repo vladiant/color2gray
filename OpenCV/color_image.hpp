@@ -23,7 +23,7 @@ struct ColorImage {
   float calc_delta(int i, int j) const;
   float calc_qdelta(int i, int p) const;
 
-  void load_quant_data(const char *fname);
+  void load_quant_data(const cv::Mat3b &source);
 
   float *calc_d();
 

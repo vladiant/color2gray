@@ -1,6 +1,7 @@
 #include "color_image.hpp"
 
 #include <cmath>
+#include <map>
 
 #include "utils.hpp"
 
@@ -19,10 +20,10 @@ float *ColorImage::calc_d() {
 
   } else {
     // more obvious but slower code for the unquantized full solve.
-    /*for( i=0; i<N;i++) for(j=0;j<N;j++) {
-            float delta = calc_delta(i,j);
-            d[i]+=delta;
-    }*/
+    // for( i=0; i<N;i++) for(j=0;j<N;j++) {
+    //         float delta = calc_delta(i,j);
+    //         d[i]+=delta;
+    // }
 
     for (i = 0; i < N; i++)
       for (j = i + 1; j < N; j++) {
@@ -105,5 +106,49 @@ void ColorImage::load(const cv::Mat3b &source) {
   for (int i = 0; i < N; i++, ++it) {
     const cv::Vec3b color = *it;
     data[i] = amy_lab(rgb(color[2], color[1], color[0]));
+  }
+}
+
+void ColorImage::load_quant_data(const cv::Mat3b &source) {
+  using sven::rgb;
+
+  if (data) delete[] data;
+
+  w = source.cols;
+  h = source.rows;
+
+  std::vector<rgb> colors;
+
+  data = new amy_lab[N];
+
+  auto it = source.begin();
+  for (int i = 0; i < N; i++, ++it) {
+    const cv::Vec3b color = *it;
+    colors.emplace_back(color[2], color[1], color[0]);
+    data[i] = amy_lab(rgb(color[2], color[1], color[0]));
+  }
+
+  N = w * h;
+  printf("quantized image loaded, w: %d, y: %d.\n", w, h);
+
+  qdata.clear();
+
+  using namespace std;
+
+  map<rgb, int> q;
+  map<rgb, int>::iterator r;
+  for (int i = 0; i < N; i++) {
+    r = q.find(colors[i]);
+    if (r == q.end())
+      q[colors[i]] = 1;
+    else
+      r->second++;
+  }
+
+  printf("quantized image appears to use %ld colors.\n", q.size());
+  qdata.resize(q.size());
+  int i;
+  for (i = 0, r = q.begin(); r != q.end(); r++, i++) {
+    qdata[i] = amy_lab_int(amy_lab(r->first), r->second);
   }
 }

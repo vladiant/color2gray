@@ -14,7 +14,7 @@ void GrayImage::r_solve(const float *d, int r) {
   int k, x, y;
 
   for (k = 0; k < iters; k++) {
-    printf("iter %d\n.", k);
+    printf("iter %d\n", k);
 
     // perform a Gauss-Seidel relaxation.
     for (x = 0; x < w; x++)
@@ -70,7 +70,7 @@ cv::Mat GrayImage::saveColor(const char *fname,
   for (int i = 0; i < N; i++, ++it) {
     const sven::rgb rval =
         amy_lab(data[i], ((source.data)[i]).a, ((source.data)[i]).b).to_rgb();
-    *it = cv::Vec3b(rval.r, rval.g, rval.b);
+    *it = cv::Vec3b(rval.b, rval.g, rval.r);
   }
 
   cv::imwrite(fname, out_image);

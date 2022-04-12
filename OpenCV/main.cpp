@@ -5,6 +5,7 @@
 
 #include "color_image.hpp"
 #include "gray_image.hpp"
+#include "utils.hpp"
 
 constexpr auto doc = R"doc(
 color2gray algorithm OpenCV demo
@@ -71,35 +72,33 @@ int main(int argc, char** argv) {
                                     image_path.extension().string();
 
   // load the image
-  ColorImage source1(theta, alpha, quantize);
-  source1.load(source);
-  GrayImage dest(source1);
+  ColorImage initial_image(theta, alpha, quantize);
+  initial_image.load(source);
+  GrayImage dest(initial_image);
 
   // solve, either using the complete case or the neighboorhod case.
   float* d;
   if (r) {
-    d = source1.r_calc_d(r);
+    d = initial_image.r_calc_d(r);
     dest.r_solve(d, r);
   } else {
     if (quantize) {
-      char magick_string[256];
-      // sprintf(magick_string,"convert -colors %d %s
-      // quant-%s",q_colors,fname,fname);
-      printf("\nUsing image magick to create a quantized image: \n%s\n",
-             magick_string);
-      system(magick_string);
+      printf("\nCreate a quantized image\n");
+      const auto quantized = quantify_image(source, q_colors);
+      initial_image.load_quant_data(quantized);
       printf("done.\n\n");
-      // sprintf(magick_string,"quant-%s",fname);
-      // source1.load_quant_data(magick_string);
+
+      cv::namedWindow("quantized", cv::WINDOW_NORMAL);
+      cv::imshow("quantized", quantized);
     }
 
-    d = source1.calc_d();
+    d = initial_image.calc_d();
     dest.complete_solve(d);
   }
-  dest.post_solve(source1);
+  dest.post_solve(initial_image);
 
   auto gray_image = dest.save(outname.c_str());
-  auto color_image = dest.saveColor(outname_color.c_str(), source1);
+  auto color_image = dest.saveColor(outname_color.c_str(), initial_image);
 
   cv::namedWindow("input", cv::WINDOW_NORMAL);
   cv::imshow("input", source);
