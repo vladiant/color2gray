@@ -14,7 +14,7 @@ void GrayImage::r_solve(const float *d, int r) {
   int k, x, y;
 
   for (k = 0; k < iters; k++) {
-    printf("iter %d\n", k);
+    // printf("iter %d\n", k);
 
     // perform a Gauss-Seidel relaxation.
     for (x = 0; x < w; x++)

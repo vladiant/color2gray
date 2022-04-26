@@ -76,6 +76,8 @@ int main(int argc, char** argv) {
   initial_image.load(source);
   GrayImage dest(initial_image);
 
+  const auto start = std::chrono::high_resolution_clock::now();
+
   // solve, either using the complete case or the neighboorhod case.
   float* d;
   if (r) {
@@ -96,6 +98,12 @@ int main(int argc, char** argv) {
     dest.complete_solve(d);
   }
   dest.post_solve(initial_image);
+
+  const auto end = std::chrono::high_resolution_clock::now();
+  const auto process_time =
+      std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+          .count();
+  std::cout << "c2g completed in " << process_time << " milliseconds\n";
 
   auto gray_image = dest.save(outname.c_str());
   auto color_image = dest.saveColor(outname_color.c_str(), initial_image);
