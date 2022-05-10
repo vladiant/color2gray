@@ -3,7 +3,7 @@
 namespace sven {
 struct rgb {
   unsigned char r, g, b;
-  rgb() {}
+  rgb() : r{}, g{}, b{} {}
   rgb(unsigned char r, unsigned char g, unsigned char b) : r(r), g(g), b(b) {}
   bool operator<(const rgb &c) const {
     if (r < c.r) return true;

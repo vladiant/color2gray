@@ -8,8 +8,8 @@ struct amy_lab {
 
   amy_lab() = default;
   amy_lab(float l, float a, float b);
-  amy_lab(const sven::rgb &c);
-  amy_lab(amy_xyz &c);
+  explicit amy_lab(const sven::rgb &c);
+  explicit amy_lab(const amy_xyz &c);
 
-  sven::rgb to_rgb();
+  sven::rgb to_rgb() const;
 };

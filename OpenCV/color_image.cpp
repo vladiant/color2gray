@@ -10,23 +10,22 @@ ColorImage::ColorImage(float a_theta, float a_alpha, bool a_quantize)
 
 float *ColorImage::calc_d() {
   float *d = new float[N];
-  int i, j;
-  for (i = 0; i < N; i++) d[i] = 0;
+  for (int i = 0; i < N; i++) d[i] = 0;
 
   if (quantize) {
     int p;
-    for (i = 0; i < N; i++)
+    for (int i = 0; i < N; i++)
       for (p = 0; p < qdata.size(); p++) d[i] += calc_qdelta(i, p);
 
   } else {
     // more obvious but slower code for the unquantized full solve.
-    // for( i=0; i<N;i++) for(j=0;j<N;j++) {
+    // for(int i=0; i<N;i++) for(j=0;j<N;j++) {
     //         float delta = calc_delta(i,j);
     //         d[i]+=delta;
     // }
 
-    for (i = 0; i < N; i++)
-      for (j = i + 1; j < N; j++) {
+    for (int i = 0; i < N; i++)
+      for (int j = i + 1; j < N; j++) {
         float delta = calc_delta(i, j);
         d[i] += delta;
         d[j] -= delta;
@@ -145,10 +144,10 @@ void ColorImage::load_quant_data(const cv::Mat3b &source) {
       r->second++;
   }
 
-  printf("quantized image appears to use %ld colors.\n", q.size());
+  printf("quantized image appears to use %zu colors.\n", q.size());
   qdata.resize(q.size());
   int i;
-  for (i = 0, r = q.begin(); r != q.end(); r++, i++) {
+  for (i = 0, r = q.begin(); r != q.end(); ++r, i++) {
     qdata[i] = amy_lab_int(amy_lab(r->first), r->second);
   }
 }

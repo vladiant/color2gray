@@ -11,11 +11,9 @@ cv::Mat3b quantify_image(const cv::Mat3b& source, int q_colors) {
                              20, 1.0);
   cv::Mat labels;
   cv::Mat centers;
-  const auto ret = cv::kmeans(points, q_colors, labels, condition, 10,
-                              cv::KMEANS_RANDOM_CENTERS, centers);
-  // std::cout << ret << '\n';
-  // std::cout << labels << '\n';
-  // std::cout << centers << '\n';
+  cv::kmeans(points, q_colors, labels, condition, 10, cv::KMEANS_RANDOM_CENTERS,
+             centers);
+
   for (int i = 0; i < points.rows; i++) {
     points.at<cv::Point3f>(i, 0) =
         centers.at<cv::Point3f>(labels.at<int>(i, 0), 0);

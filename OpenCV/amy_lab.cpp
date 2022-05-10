@@ -9,7 +9,7 @@ amy_lab::amy_lab(const sven::rgb &c) {
   *this = amy_lab(temp);
 }
 
-amy_lab::amy_lab(amy_xyz &c) {
+amy_lab::amy_lab(const amy_xyz &c) {
   using sven::one_third;
 
   float X_third = std::pow(c.X, (float)one_third);
@@ -25,7 +25,7 @@ amy_lab::amy_lab(amy_xyz &c) {
   b = 200.0f * ((Y_third) - (Z_third));
 }
 
-sven::rgb amy_lab::to_rgb() {
+sven::rgb amy_lab::to_rgb() const {
   float P = (l + 16.0) / 116.0;
 
   // Define as constants

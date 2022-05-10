@@ -22,7 +22,7 @@ amy_xyz::amy_xyz(const sven::rgb &c) {
   Z = Z / Zn;
 }
 
-sven::rgb amy_xyz::to_rgb() {
+sven::rgb amy_xyz::to_rgb() const {
   // for RGB [0,1] etc.
   float R = 3.240479f * X + -1.537150f * Y + -0.498535f * Z;
   float G = -0.969256f * X + 1.875992f * Y + 0.041556f * Z;

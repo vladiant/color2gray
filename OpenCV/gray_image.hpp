@@ -7,14 +7,16 @@
 struct GrayImage {
   float *data;
   const int w, h, N;
-  int i, j, k;
 
   // this will shift our data to best match the
   // luminance channel of s.
   void post_solve(const ColorImage &s);
 
-  GrayImage(ColorImage &s);
+  explicit GrayImage(ColorImage &s);
   ~GrayImage();
+
+  GrayImage(const GrayImage &) = delete;
+  GrayImage &operator=(const GrayImage &) = delete;
 
   void complete_solve(const float *d);
   void r_solve(const float *d, int r);

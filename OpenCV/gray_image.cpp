@@ -4,7 +4,7 @@
 
 GrayImage::GrayImage(ColorImage &s)
     : data(new float[s.N]), w(s.w), h(s.h), N(s.N) {
-  for (i = 0; i < N; i++) data[i] = (s.data)[i].l;
+  for (int i = 0; i < N; i++) data[i] = (s.data)[i].l;
 }
 
 GrayImage::~GrayImage() { delete[] data; }
@@ -38,7 +38,7 @@ void GrayImage::r_solve(const float *d, int r) {
 }
 
 void GrayImage::complete_solve(const float *d) {
-  for (i = 1; i < N; i++) {
+  for (int i = 1; i < N; i++) {
     data[i] = d[i] - d[i - 1] + N * data[i - 1];
     data[i] /= (float)N;
   }
@@ -46,9 +46,9 @@ void GrayImage::complete_solve(const float *d) {
 
 void GrayImage::post_solve(const ColorImage &s) {
   float error = 0;
-  for (i = 0; i < N; i++) error += data[i] - (s.data)[i].l;
+  for (int i = 0; i < N; i++) error += data[i] - (s.data)[i].l;
   error /= N;
-  for (i = 0; i < N; i++) data[i] = data[i] - error;
+  for (int i = 0; i < N; i++) data[i] = data[i] - error;
 }
 
 cv::Mat GrayImage::save(const char *fname) const {

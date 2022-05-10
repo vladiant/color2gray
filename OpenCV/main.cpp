@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
   const float alpha = parser.get<float>("alpha");
   std::cout << "Alpha = " << alpha << '\n';
 
-  const int r = parser.get<int>("alpha");
+  const int r = parser.get<int>("r");
   std::cout << "mu = " << r << '\n';
 
   bool quantize = false;
