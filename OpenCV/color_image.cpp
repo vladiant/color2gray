@@ -13,9 +13,8 @@ float *ColorImage::calc_d() {
   for (int i = 0; i < N; i++) d[i] = 0;
 
   if (quantize) {
-    int p;
     for (int i = 0; i < N; i++)
-      for (p = 0; p < qdata.size(); p++) d[i] += calc_qdelta(i, p);
+      for (size_t p = 0; p < qdata.size(); p++) d[i] += calc_qdelta(i, p);
 
   } else {
     // more obvious but slower code for the unquantized full solve.
