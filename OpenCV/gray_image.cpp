@@ -2,12 +2,9 @@
 
 #include <opencv2/imgcodecs.hpp>
 
-GrayImage::GrayImage(ColorImage &s)
-    : data(new float[s.N]), w(s.w), h(s.h), N(s.N) {
+GrayImage::GrayImage(ColorImage &s) : data(s.N), w(s.w), h(s.h), N(s.N) {
   for (int i = 0; i < N; i++) data[i] = (s.data)[i].l;
 }
-
-GrayImage::~GrayImage() { delete[] data; }
 
 void GrayImage::r_solve(const float *d, int r) {
   const int iters = 30;

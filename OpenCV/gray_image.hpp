@@ -1,11 +1,12 @@
 #pragma once
 
 #include <opencv2/core/mat.hpp>
+#include <vector>
 
 #include "color_image.hpp"
 
 struct GrayImage {
-  float *data;
+  std::vector<float> data;
   const int w, h, N;
 
   // this will shift our data to best match the
@@ -13,7 +14,6 @@ struct GrayImage {
   void post_solve(const ColorImage &s);
 
   explicit GrayImage(ColorImage &s);
-  ~GrayImage();
 
   GrayImage(const GrayImage &) = delete;
   GrayImage &operator=(const GrayImage &) = delete;

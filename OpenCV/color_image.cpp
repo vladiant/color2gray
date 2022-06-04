@@ -90,15 +90,13 @@ float ColorImage::crunch(float chrom_dist) const {
 void ColorImage::load(const cv::Mat3b &source) {
   using sven::rgb;
 
-  if (data) delete[] data;
-
   w = source.cols;
   h = source.rows;
 
   N = w * h;
   printf("image loaded, w: %d, y: %d.\n", w, h);
 
-  data = new amy_lab[N];
+  data.resize(N);
 
   auto it = source.begin();
   for (int i = 0; i < N; i++, ++it) {
@@ -110,14 +108,12 @@ void ColorImage::load(const cv::Mat3b &source) {
 void ColorImage::load_quant_data(const cv::Mat3b &source) {
   using sven::rgb;
 
-  if (data) delete[] data;
-
   w = source.cols;
   h = source.rows;
 
   std::vector<rgb> colors;
 
-  data = new amy_lab[N];
+  data.resize(N);
 
   auto it = source.begin();
   for (int i = 0; i < N; i++, ++it) {

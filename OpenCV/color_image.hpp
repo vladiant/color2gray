@@ -8,7 +8,7 @@
 struct ColorImage {
   ColorImage(float a_theta, float a_alpha, bool a_quantize);
 
-  amy_lab *data{nullptr};
+  std::vector<amy_lab> data;
 
   typedef std::pair<amy_lab, int> amy_lab_int;
   std::vector<amy_lab_int> qdata;
@@ -16,8 +16,6 @@ struct ColorImage {
   int colors{};
 
   int w{}, h{}, N{};
-
-  ColorImage() : data(NULL) {}
 
   float calc_delta(int i, int j) const;
   float calc_qdelta(int i, int p) const;
