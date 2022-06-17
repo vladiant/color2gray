@@ -8,8 +8,8 @@
 ColorImage::ColorImage(float a_theta, float a_alpha, bool a_quantize)
     : theta{a_theta}, alpha{a_alpha}, quantize{a_quantize} {}
 
-float *ColorImage::calc_d() {
-  float *d = new float[N];
+std::vector<float> ColorImage::calc_d() {
+  std::vector<float> d(N);
   for (int i = 0; i < N; i++) d[i] = 0;
 
   if (quantize) {
@@ -33,8 +33,8 @@ float *ColorImage::calc_d() {
   return d;
 }
 
-float *ColorImage::r_calc_d(int r) {
-  float *d = new float[N];
+std::vector<float> ColorImage::r_calc_d(int r) {
+  std::vector<float> d(N);
   int i;
   for (i = 0; i < N; i++) d[i] = 0;
 

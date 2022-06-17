@@ -18,8 +18,8 @@ struct GrayImage {
   GrayImage(const GrayImage &) = delete;
   GrayImage &operator=(const GrayImage &) = delete;
 
-  void complete_solve(const float *d);
-  void r_solve(const float *d, int r);
+  void complete_solve(const std::vector<float> &d);
+  void r_solve(const std::vector<float> &d, int r);
 
   cv::Mat save(const char *fname) const;
   cv::Mat saveColor(const char *fname, const ColorImage &source) const;

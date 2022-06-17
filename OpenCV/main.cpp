@@ -79,9 +79,8 @@ int main(int argc, char** argv) {
   const auto start = std::chrono::high_resolution_clock::now();
 
   // solve, either using the complete case or the neighboorhod case.
-  float* d;
   if (r) {
-    d = initial_image.r_calc_d(r);
+    auto d = initial_image.r_calc_d(r);
     dest.r_solve(d, r);
   } else {
     if (quantize) {
@@ -94,7 +93,7 @@ int main(int argc, char** argv) {
       cv::imshow("quantized", quantized);
     }
 
-    d = initial_image.calc_d();
+    auto d = initial_image.calc_d();
     dest.complete_solve(d);
   }
   dest.post_solve(initial_image);
@@ -123,8 +122,6 @@ int main(int argc, char** argv) {
       break;
     }
   }
-
-  delete[] d;
 
   return EXIT_SUCCESS;
 }

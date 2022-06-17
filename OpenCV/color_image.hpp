@@ -22,9 +22,9 @@ struct ColorImage {
 
   void load_quant_data(const cv::Mat3b &source);
 
-  float *calc_d();
+  std::vector<float> calc_d();
 
-  float *r_calc_d(int r);
+  std::vector<float> r_calc_d(int r);
 
   void load(const cv::Mat3b &source);
 
