@@ -75,3 +75,33 @@ target_link_libraries(
         ${OpenCV_LIBS}
         ColorToGrayLib
 )
+
+# Tests
+include(CTest)
+
+add_executable(
+    TestColor2Gray
+    test/main.cpp
+)
+
+set_target_properties(
+    TestColor2Gray
+    PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+)
+
+target_include_directories(
+    TestColor2Gray
+    PRIVATE
+        test
+)
+
+target_link_libraries(
+    TestColor2Gray
+    PRIVATE
+        ColorToGrayLib
+)
+
+add_test(NAME TestColor2Gray COMMAND TestColor2Gray)
