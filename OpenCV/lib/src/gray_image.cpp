@@ -56,7 +56,10 @@ cv::Mat GrayImage::save(const char *fname) const {
     *it = cv::Vec3b(rval.r, rval.g, rval.b);
   }
 
-  cv::imwrite(fname, out_image);
+  if (fname) {
+    cv::imwrite(fname, out_image);
+  }
+
   return out_image;
 }
 
@@ -70,6 +73,9 @@ cv::Mat GrayImage::saveColor(const char *fname,
     *it = cv::Vec3b(rval.b, rval.g, rval.r);
   }
 
-  cv::imwrite(fname, out_image);
+  if (fname) {
+    cv::imwrite(fname, out_image);
+  }
+
   return out_image;
 }

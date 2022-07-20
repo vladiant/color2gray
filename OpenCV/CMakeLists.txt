@@ -81,6 +81,9 @@ include(CTest)
 
 add_executable(
     TestColor2Gray
+    test/test_utils.hpp
+    test/test_utils.cpp
+    test/test_color2gray.cpp
     test/main.cpp
 )
 
