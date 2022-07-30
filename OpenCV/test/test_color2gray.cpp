@@ -1,6 +1,7 @@
 #include "color_image.hpp"
 #include "doctest/doctest.h"
 #include "gray_image.hpp"
+#include "test_data.hpp"
 #include "test_utils.hpp"
 #include "utils.hpp"
 
@@ -23,7 +24,7 @@ TEST_CASE("InputImage_TransformedImages [full-test]") {
 
   // Assert
   const auto gray_image = dest.save(nullptr);
-  const auto expected_gray_image = get_expected_gray_image();
+  const auto expected_gray_image = full_image::get_expected_gray_image();
   REQUIRE(expected_gray_image.size() == gray_image.size());
 
   auto it_gray_test = gray_image.begin<cv::Vec3b>();
@@ -34,7 +35,7 @@ TEST_CASE("InputImage_TransformedImages [full-test]") {
   }
 
   const auto color_image = dest.saveColor(nullptr, initial_image);
-  const auto expected_color_image = get_expected_color_image();
+  const auto expected_color_image = full_image::get_expected_color_image();
   REQUIRE(expected_color_image.size() == color_image.size());
 
   auto it_color_test = color_image.begin<cv::Vec3b>();
