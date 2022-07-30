@@ -25,23 +25,9 @@ TEST_CASE("InputImage_TransformedImages [full-test]") {
   // Assert
   const auto gray_image = dest.save(nullptr);
   const auto expected_gray_image = full_image::get_expected_gray_image();
-  REQUIRE(expected_gray_image.size() == gray_image.size());
-
-  auto it_gray_test = gray_image.begin<cv::Vec3b>();
-  auto it_gray_expected = expected_gray_image.begin<cv::Vec3b>();
-  for (; it_gray_test != gray_image.end<cv::Vec3b>();
-       ++it_gray_test, ++it_gray_expected) {
-    REQUIRE(*it_gray_test == *it_gray_expected);
-  }
+  compare_images(gray_image, expected_gray_image);
 
   const auto color_image = dest.saveColor(nullptr, initial_image);
   const auto expected_color_image = full_image::get_expected_color_image();
-  REQUIRE(expected_color_image.size() == color_image.size());
-
-  auto it_color_test = color_image.begin<cv::Vec3b>();
-  auto it_color_expected = expected_color_image.begin<cv::Vec3b>();
-  for (; it_color_test != color_image.end<cv::Vec3b>();
-       ++it_color_test, ++it_color_expected) {
-    REQUIRE(*it_color_test == *it_color_expected);
-  }
+  compare_images(color_image, expected_color_image);
 }
