@@ -15,5 +15,5 @@ int main(int argc, char **argv) {
     return res;
   }
 
-  return EXIT_SUCCESS;
+  return res;
 }
