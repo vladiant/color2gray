@@ -15,3 +15,12 @@ cv::Mat get_expected_gray_image();
 
 cv::Mat get_expected_color_image();
 }  // namespace mu_image
+
+namespace quantized_image {
+
+cv::Mat get_expected_quantized_image();
+
+cv::Mat get_expected_gray_image();
+
+cv::Mat get_expected_color_image();
+}  // namespace quantized_image
