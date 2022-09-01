@@ -4,7 +4,7 @@
 #include "rgb.hpp"
 
 struct amy_lab {
-  float l, a, b;
+  float l{}, a{}, b{};
 
   amy_lab() = default;
   amy_lab(float l, float a, float b);

@@ -45,11 +45,11 @@ int main(int argc, char** argv) {
   }
 
   // Read parameters
-  const float theta_deg = parser.get<float>("theta");
+  const auto theta_deg = parser.get<float>("theta");
   std::cout << "Theta = " << theta_deg << '\n';
   const float theta = theta_deg * d2r;
 
-  const float alpha = parser.get<float>("alpha");
+  const auto alpha = parser.get<float>("alpha");
   std::cout << "Alpha = " << alpha << '\n';
 
   const int r = parser.get<int>("r");

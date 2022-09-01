@@ -8,7 +8,7 @@ GrayImage::GrayImage(ColorImage &s) : data(s.N), w(s.w), h(s.h), N(s.N) {
 
 void GrayImage::r_solve(const std::vector<float> &d, int r) {
   const int iters = 30;
-  int k, x, y;
+  int k = 0, x = 0, y = 0;
 
   for (k = 0; k < iters; k++) {
     // printf("iter %d\n", k);
@@ -18,7 +18,7 @@ void GrayImage::r_solve(const std::vector<float> &d, int r) {
       for (y = 0; y < h; y++) {
         float sum = 0;
         int count = 0;
-        int xx, yy;
+        int xx = 0, yy = 0;
 
         for (xx = x - r; xx <= x + r; xx++) {
           if (xx < 0 || xx >= w) continue;
@@ -60,7 +60,7 @@ cv::Mat GrayImage::save(const char *fname) const {
     cv::imwrite(fname, out_image);
   }
 
-  return out_image;
+  return std::move(out_image);
 }
 
 cv::Mat GrayImage::saveColor(const char *fname,
@@ -77,5 +77,5 @@ cv::Mat GrayImage::saveColor(const char *fname,
     cv::imwrite(fname, out_image);
   }
 
-  return out_image;
+  return std::move(out_image);
 }

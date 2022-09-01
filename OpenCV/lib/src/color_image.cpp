@@ -35,13 +35,13 @@ std::vector<float> ColorImage::calc_d() {
 
 std::vector<float> ColorImage::r_calc_d(int r) {
   std::vector<float> d(N);
-  int i;
+  int i = 0;
   for (i = 0; i < N; i++) d[i] = 0;
 
-  int x, y;
+  int x = 0, y = 0;
   for (x = 0; x < w; x++)
     for (y = 0; y < h; y++) {
-      int xx, yy;
+      int xx = 0, yy = 0;
 
       i = x + y * w;
 
@@ -64,11 +64,11 @@ float ColorImage::calc_delta(int i, int j) const {
   const amy_lab &b = data[j];
 
   float dL = a.l - b.l;
-  float dC = crunch(sqrt(sq(a.a - b.a) + sq(a.b - b.b)));
+  float dC = crunch(std::sqrt(sq(a.a - b.a) + sq(a.b - b.b)));
 
   if (fabsf(dL) > dC) return dL;
   return dC *
-         ((cos(theta) * (a.a - b.a) + sin(theta) * (a.b - b.b)) > 0 ? 1 : -1);
+         ((std::cos(theta) * (a.a - b.a) + std::sin(theta) * (a.b - b.b)) > 0 ? 1 : -1);
 }
 
 float ColorImage::calc_qdelta(int i, int p) const {
@@ -76,15 +76,15 @@ float ColorImage::calc_qdelta(int i, int p) const {
   const amy_lab &b = qdata[p].first;
 
   float dL = a.l - b.l;
-  float dC = crunch(sqrt(sq(a.a - b.a) + sq(a.b - b.b)));
+  float dC = crunch(std::sqrt(sq(a.a - b.a) + sq(a.b - b.b)));
 
   if (fabsf(dL) > dC) return qdata[p].second * dL;
   return qdata[p].second * dC *
-         ((cos(theta) * (a.a - b.a) + sin(theta) * (a.b - b.b)) > 0 ? 1 : -1);
+         ((std::cos(theta) * (a.a - b.a) + std::sin(theta) * (a.b - b.b)) > 0 ? 1 : -1);
 }
 
 float ColorImage::crunch(float chrom_dist) const {
-  return alpha == 0 ? 0 : alpha * tanh(chrom_dist / alpha);
+  return alpha == 0 ? 0 : alpha * std::tanh(chrom_dist / alpha);
 }
 
 void ColorImage::load(const cv::Mat3b &source) {
@@ -141,7 +141,7 @@ void ColorImage::load_quant_data(const cv::Mat3b &source) {
 
   printf("quantized image appears to use %zu colors.\n", q.size());
   qdata.resize(q.size());
-  int i;
+  int i = 0;
   for (i = 0, r = q.begin(); r != q.end(); ++r, i++) {
     qdata[i] = amy_lab_int(amy_lab(r->first), r->second);
   }
