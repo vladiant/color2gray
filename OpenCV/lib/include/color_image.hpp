@@ -9,12 +9,6 @@ struct ColorImage {
   ColorImage(float a_theta, float a_alpha, bool a_quantize);
 
   std::vector<amy_lab> data;
-
-  typedef std::pair<amy_lab, int> amy_lab_int;
-  std::vector<amy_lab_int> qdata;
-
-  int colors{};
-
   int mW{}, mH{}, mN{};
 
   float calc_delta(int i, int j) const;
@@ -29,6 +23,11 @@ struct ColorImage {
   void load(const cv::Mat3b &source);
 
  private:
+  typedef std::pair<amy_lab, int> amy_lab_int;
+  std::vector<amy_lab_int> mQdata;
+
+  int mColors{};
+
   float mTheta{};
   float mAlpha{};
   bool mQuantize{};
