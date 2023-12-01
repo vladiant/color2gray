@@ -5,10 +5,11 @@
 
 #include "color_image.hpp"
 
-struct GrayImage {
-  std::vector<float> data;
-  const int w, h, N;
+class GrayImage {
+  std::vector<float> mData;
+  const int mW, mH, mN;
 
+ public:
   // this will shift our data to best match the
   // luminance channel of s.
   void post_solve(const ColorImage &s);
