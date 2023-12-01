@@ -15,7 +15,7 @@ struct ColorImage {
 
   int colors{};
 
-  int w{}, h{}, N{};
+  int mW{}, mH{}, mN{};
 
   float calc_delta(int i, int j) const;
   float calc_qdelta(int i, int p) const;
@@ -29,9 +29,9 @@ struct ColorImage {
   void load(const cv::Mat3b &source);
 
  private:
-  float theta{};
-  float alpha{};
-  bool quantize{};
+  float mTheta{};
+  float mAlpha{};
+  bool mQuantize{};
 
   float crunch(float chrom_dist) const;
 };

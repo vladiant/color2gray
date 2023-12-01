@@ -1,17 +1,18 @@
 #include "gray_image.hpp"
 
+#include <iostream>
 #include <opencv2/imgcodecs.hpp>
 
-GrayImage::GrayImage(ColorImage &s) : data(s.N), w(s.w), h(s.h), N(s.N) {
+GrayImage::GrayImage(ColorImage &s) : data(s.mN), w(s.mW), h(s.mH), N(s.mN) {
   for (int i = 0; i < N; i++) data[i] = (s.data)[i].l;
 }
 
 void GrayImage::r_solve(const std::vector<float> &d, int r) {
-  const int iters = 30;
+  constexpr int iters = 30;
   int k = 0, x = 0, y = 0;
 
   for (k = 0; k < iters; k++) {
-    // printf("iter %d\n", k);
+    // std::cout << "iter " << k << "\n";
 
     // perform a Gauss-Seidel relaxation.
     for (x = 0; x < w; x++)

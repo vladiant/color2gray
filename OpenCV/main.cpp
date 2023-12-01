@@ -12,7 +12,6 @@ color2gray algorithm OpenCV demo
 )doc";
 
 constexpr float d2r = M_PI / 180.0;
-constexpr float r2d = 180.0 / M_PI;
 constexpr float initial_theta = 3.14 / 6.0;
 
 int main(int argc, char** argv) {
@@ -84,10 +83,10 @@ int main(int argc, char** argv) {
     dest.r_solve(d, r);
   } else {
     if (quantize) {
-      printf("\nCreate a quantized image\n");
+      std::cout << "\nCreate a quantized image\n";
       const auto quantized = quantify_image(source, q_colors);
       initial_image.load_quant_data(quantized);
-      printf("done.\n\n");
+      std::cout << "done.\n\n";
 
       cv::namedWindow("quantized", cv::WINDOW_NORMAL);
       cv::imshow("quantized", quantized);
