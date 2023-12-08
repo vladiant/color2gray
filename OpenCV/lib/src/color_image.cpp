@@ -19,10 +19,11 @@ std::vector<float> ColorImage::calc_d() {
 
   } else {
     // more obvious but slower code for the unquantized full solve.
-    // for(int i=0; i<N;i++) for(j=0;j<N;j++) {
-    //         float delta = calc_delta(i,j);
-    //         d[i]+=delta;
-    // }
+    // for (int i = 0; i < mN; i++)
+    //   for (int j = 0; j < mN; j++) {
+    //     float delta = calc_delta(i, j);
+    //     d[i] += delta;
+    //   }
 
     for (int i = 0; i < mN; i++)
       for (int j = i + 1; j < mN; j++) {
