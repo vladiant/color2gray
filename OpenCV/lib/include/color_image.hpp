@@ -8,8 +8,6 @@
 struct ColorImage {
   ColorImage(float a_theta, float a_alpha, bool a_quantize);
 
-  int mW{}, mH{}, mN{};
-
   float calc_delta(int i, int j) const;
   float calc_qdelta(int i, int p) const;
 
@@ -23,7 +21,12 @@ struct ColorImage {
 
   const std::vector<amy_lab> &getData() const { return mData; }
 
+  int getW() const { return mW; }
+  int getH() const { return mH; }
+  int getN() const { return mN; }
+
  private:
+  int mW{}, mH{}, mN{};
   std::vector<amy_lab> mData;
 
   typedef std::pair<amy_lab, int> amy_lab_int;

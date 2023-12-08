@@ -3,8 +3,8 @@
 #include <iostream>
 #include <opencv2/imgcodecs.hpp>
 
-GrayImage::GrayImage(ColorImage &s)
-    : mData(s.mN), mW(s.mW), mH(s.mH), mN(s.mN) {
+GrayImage::GrayImage(const ColorImage &s)
+    : mData(s.getN()), mW(s.getW()), mH(s.getH()), mN(s.getN()) {
   const auto &data = s.getData();
   for (int i = 0; i < mN; i++) mData[i] = data[i].l;
 }

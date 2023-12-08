@@ -14,7 +14,7 @@ class GrayImage {
   // luminance channel of s.
   void post_solve(const ColorImage &s);
 
-  explicit GrayImage(ColorImage &s);
+  explicit GrayImage(const ColorImage &s);
 
   GrayImage(const GrayImage &) = delete;
   GrayImage &operator=(const GrayImage &) = delete;
