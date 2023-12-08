@@ -5,6 +5,7 @@
 
 #include "color_image.hpp"
 #include "gray_image.hpp"
+#include "time_bench.hpp"
 #include "utils.hpp"
 
 constexpr auto doc = R"doc(
@@ -79,23 +80,38 @@ int main(int argc, char** argv) {
 
   // solve, either using the complete case or the neighboorhod case.
   if (r) {
-    auto d = initial_image.r_calc_d(r);
+    std::vector<float> d;
+    {
+      const TimeBench bench{"r_calc_d"};
+      d = initial_image.r_calc_d(r);
+    }
+
+    const TimeBench bench{"r_solve"};
     dest.r_solve(d, r);
   } else {
     if (quantize) {
-      std::cout << "\nCreate a quantized image\n";
+      const TimeBench bench{"Create a quantized image"};
       const auto quantized = quantify_image(source, q_colors);
       initial_image.load_quant_data(quantized);
-      std::cout << "done.\n\n";
 
-      cv::namedWindow("quantized", cv::WINDOW_NORMAL);
-      cv::imshow("quantized", quantized);
+      // cv::namedWindow("quantized", cv::WINDOW_NORMAL);
+      // cv::imshow("quantized", quantized);
     }
 
-    auto d = initial_image.calc_d();
+    std::vector<float> d;
+    {
+      const TimeBench bench{"calc_d"};
+      d = initial_image.calc_d();
+    }
+
+    const TimeBench bench{"complete_solve"};
     dest.complete_solve(d);
   }
-  dest.post_solve(initial_image);
+
+  {
+    const TimeBench bench{"post_solve"};
+    dest.post_solve(initial_image);
+  }
 
   const auto end = std::chrono::high_resolution_clock::now();
   const auto process_time =

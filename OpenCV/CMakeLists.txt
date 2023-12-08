@@ -6,6 +6,8 @@ find_package(OpenCV REQUIRED)
 
 add_library(
     ColorToGrayLib
+    lib/include/time_bench.hpp
+    lib/src/time_bench.cpp
     lib/include/utils.hpp
     lib/src/utils.cpp
     lib/include/rgb.hpp
