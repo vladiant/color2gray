@@ -5,7 +5,8 @@
 
 GrayImage::GrayImage(ColorImage &s)
     : mData(s.mN), mW(s.mW), mH(s.mH), mN(s.mN) {
-  for (int i = 0; i < mN; i++) mData[i] = (s.data)[i].l;
+  const auto &data = s.getData();
+  for (int i = 0; i < mN; i++) mData[i] = data[i].l;
 }
 
 void GrayImage::r_solve(const std::vector<float> &d, int r) {
@@ -45,7 +46,8 @@ void GrayImage::complete_solve(const std::vector<float> &d) {
 
 void GrayImage::post_solve(const ColorImage &s) {
   float error = 0;
-  for (int i = 0; i < mN; i++) error += mData[i] - (s.data)[i].l;
+  const auto &data = s.getData();
+  for (int i = 0; i < mN; i++) error += mData[i] - data[i].l;
   error /= mN;
   for (int i = 0; i < mN; i++) mData[i] = mData[i] - error;
 }
@@ -69,9 +71,9 @@ cv::Mat GrayImage::saveColor(const char *fname,
                              const ColorImage &source) const {
   cv::Mat3b out_image(mH, mW);
   auto it = out_image.begin();
+  const auto &data = source.getData();
   for (int i = 0; i < mN; i++, ++it) {
-    const sven::rgb rval =
-        amy_lab(mData[i], ((source.data)[i]).a, ((source.data)[i]).b).to_rgb();
+    const sven::rgb rval = amy_lab(mData[i], (data[i]).a, (data[i]).b).to_rgb();
     *it = cv::Vec3b(rval.b, rval.g, rval.r);
   }
 

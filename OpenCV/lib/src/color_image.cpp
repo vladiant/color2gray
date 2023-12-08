@@ -62,8 +62,8 @@ std::vector<float> ColorImage::r_calc_d(int r) {
 }
 
 float ColorImage::calc_delta(int i, int j) const {
-  const amy_lab &a = data[i];
-  const amy_lab &b = data[j];
+  const amy_lab &a = mData[i];
+  const amy_lab &b = mData[j];
 
   float dL = a.l - b.l;
   float dC = crunch(std::sqrt(sq(a.a - b.a) + sq(a.b - b.b)));
@@ -76,7 +76,7 @@ float ColorImage::calc_delta(int i, int j) const {
 }
 
 float ColorImage::calc_qdelta(int i, int p) const {
-  const amy_lab &a = data[i];
+  const amy_lab &a = mData[i];
   const amy_lab &b = mQdata[p].first;
 
   float dL = a.l - b.l;
@@ -102,12 +102,12 @@ void ColorImage::load(const cv::Mat3b &source) {
   mN = mW * mH;
   std::cout << "image loaded, w: " << mW << ", y: " << mH << ".\n";
 
-  data.resize(mN);
+  mData.resize(mN);
 
   auto it = source.begin();
   for (int i = 0; i < mN; i++, ++it) {
     const cv::Vec3b color = *it;
-    data[i] = amy_lab(rgb(color[2], color[1], color[0]));
+    mData[i] = amy_lab(rgb(color[2], color[1], color[0]));
   }
 }
 
@@ -119,13 +119,13 @@ void ColorImage::load_quant_data(const cv::Mat3b &source) {
 
   std::vector<rgb> colors;
 
-  data.resize(mN);
+  mData.resize(mN);
 
   auto it = source.begin();
   for (int i = 0; i < mN; i++, ++it) {
     const cv::Vec3b color = *it;
     colors.emplace_back(color[2], color[1], color[0]);
-    data[i] = amy_lab(rgb(color[2], color[1], color[0]));
+    mData[i] = amy_lab(rgb(color[2], color[1], color[0]));
   }
 
   mN = mW * mH;
