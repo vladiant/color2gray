@@ -31,7 +31,7 @@ sven::rgb amy_xyz::to_rgb() const {
   G = clamp(G, 0.0, 1.0);
   B = clamp(B, 0.0, 1.0);
 
-  return sven::rgb(static_cast<unsigned char>(R * 255),
+  return {static_cast<unsigned char>(R * 255),
                    static_cast<unsigned char>(G * 255),
-                   static_cast<unsigned char>(B * 255));
+                   static_cast<unsigned char>(B * 255)};
 }
