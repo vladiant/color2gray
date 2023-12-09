@@ -8,9 +8,6 @@
 struct ColorImage {
   ColorImage(float a_theta, float a_alpha, bool a_quantize);
 
-  float calc_delta(int i, int j) const;
-  float calc_qdelta(int i, int p) const;
-
   void load_quant_data(const cv::Mat3b &source);
 
   std::vector<float> calc_d();
@@ -37,6 +34,4 @@ struct ColorImage {
   float mTheta{};
   float mAlpha{};
   bool mQuantize{};
-
-  float crunch(float chrom_dist) const;
 };

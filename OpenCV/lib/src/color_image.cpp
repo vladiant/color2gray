@@ -11,26 +11,10 @@ ColorImage::ColorImage(float a_theta, float a_alpha, bool a_quantize)
 
 std::vector<float> ColorImage::calc_d() {
   std::vector<float> d(mN);
-  for (int i = 0; i < mN; i++) d[i] = 0;
-
   if (mQuantize) {
-    for (int i = 0; i < mN; i++)
-      for (size_t p = 0; p < mQdata.size(); p++) d[i] += calc_qdelta(i, p);
-
+    calc_d_q(mN, mData.data(), mQdata, mTheta, mAlpha, d.data());
   } else {
-    // more obvious but slower code for the unquantized full solve.
-    // for (int i = 0; i < mN; i++)
-    //   for (int j = 0; j < mN; j++) {
-    //     float delta = calc_delta(i, j);
-    //     d[i] += delta;
-    //   }
-
-    for (int i = 0; i < mN; i++)
-      for (int j = i + 1; j < mN; j++) {
-        float delta = calc_delta(i, j);
-        d[i] += delta;
-        d[j] -= delta;
-      }
+    calc_d_nq(mN, mData.data(), mTheta, mAlpha, d.data());
   }
   return d;
 }
@@ -52,45 +36,13 @@ std::vector<float> ColorImage::r_calc_d(int r) {
         for (yy = y - r; yy <= y + r; yy++) {
           if (yy >= mH || yy < 0) continue;
           int j = xx + yy * mW;
-          float delta = calc_delta(i, j);
+          float delta = calc_delta(i, j, mData.data(), mTheta, mAlpha);
           d[i] += delta;
           d[j] -= delta;
         }
       }
     }
   return d;
-}
-
-float ColorImage::calc_delta(int i, int j) const {
-  const amy_lab &a = mData[i];
-  const amy_lab &b = mData[j];
-
-  float dL = a.l - b.l;
-  float dC = crunch(std::sqrt(sq(a.a - b.a) + sq(a.b - b.b)));
-
-  if (fabsf(dL) > dC) return dL;
-  return dC *
-         ((std::cos(mTheta) * (a.a - b.a) + std::sin(mTheta) * (a.b - b.b)) > 0
-              ? 1
-              : -1);
-}
-
-float ColorImage::calc_qdelta(int i, int p) const {
-  const amy_lab &a = mData[i];
-  const amy_lab &b = mQdata[p].first;
-
-  float dL = a.l - b.l;
-  float dC = crunch(std::sqrt(sq(a.a - b.a) + sq(a.b - b.b)));
-
-  if (fabsf(dL) > dC) return mQdata[p].second * dL;
-  return mQdata[p].second * dC *
-         ((std::cos(mTheta) * (a.a - b.a) + std::sin(mTheta) * (a.b - b.b)) > 0
-              ? 1
-              : -1);
-}
-
-float ColorImage::crunch(float chrom_dist) const {
-  return mAlpha == 0 ? 0 : mAlpha * std::tanh(chrom_dist / mAlpha);
 }
 
 void ColorImage::load(const cv::Mat3b &source) {
