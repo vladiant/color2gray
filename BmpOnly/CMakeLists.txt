@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(color2gray_opencv)
+project(color2gray_bmp)
 
 find_package(OpenCV REQUIRED)
 
