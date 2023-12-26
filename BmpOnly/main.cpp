@@ -12,6 +12,8 @@
 
 constexpr auto doc = R"doc(
 color2gray algorithm BMP demo
+Usage: color2gray image_name.bmp [options]
+Options:
 --help    print this message
 --theta   Theta
 --alpha   Alpha
@@ -47,7 +49,7 @@ int main(int argc, char** argv) {
   std::string image_name = "test.ppm";
   if (argc > 1) {
     image_name = argv[1];
-  }
+  } 
 
   int sourceWidth;
   int sourceHeight;
@@ -71,10 +73,7 @@ int main(int argc, char** argv) {
 
   const auto q_value = parser.value("q");
   bool quantize = !q_value.empty();
-  int q_colors = 0;
-  if (quantize) {
-    q_colors = std::stoi(q_value);
-  }
+  const int q_colors = quantize ? 0 : std::stoi(q_value);
 
   std::cout << "Executing color2gray algorithm on " << image_name
             << " with alpha=" << alpha << ", theta=" << theta_deg << '\n';
