@@ -1,7 +1,8 @@
 #include "gray_image.hpp"
 
 #include <iostream>
-#include <opencv2/imgcodecs.hpp>
+
+#include "bitmap.hpp"
 
 GrayImage::GrayImage(const ColorImage &s)
     : mData(s.getN()), mW(s.getW()), mH(s.getH()), mN(s.getN()) {
@@ -52,34 +53,39 @@ void GrayImage::post_solve(const ColorImage &s) {
   for (int i = 0; i < mN; i++) mData[i] = mData[i] - error;
 }
 
-cv::Mat GrayImage::save(const char *fname) const {
-  cv::Mat3b out_image(mH, mW);
-  auto it = out_image.begin();
-  for (int i = 0; i < mN; i++, ++it) {
+std::vector<uint8_t> GrayImage::save(const char *fname) const {
+  std::vector<uint8_t> bmpData;
+  bmpData.reserve(3 * mN);
+  for (int i = 0; i < mN; i++) {
     const sven::rgb rval = amy_lab(mData[i], 0, 0).to_rgb();
-    *it = cv::Vec3b(rval.r, rval.g, rval.b);
+    bmpData.push_back(rval.r);
+    bmpData.push_back(rval.g);
+    bmpData.push_back(rval.b);
   }
 
   if (fname) {
-    cv::imwrite(fname, out_image);
+    writeBMP(fname, mW, mH, bmpData);
   }
 
-  return std::move(out_image);
+  return bmpData;
 }
 
-cv::Mat GrayImage::saveColor(const char *fname,
+std::vector<uint8_t> GrayImage::saveColor(const char *fname,
                              const ColorImage &source) const {
-  cv::Mat3b out_image(mH, mW);
-  auto it = out_image.begin();
   const auto &data = source.getData();
-  for (int i = 0; i < mN; i++, ++it) {
+
+  std::vector<uint8_t> bmpData;
+  bmpData.reserve(3 * mN);
+  for (int i = 0; i < mN; i++) {
     const sven::rgb rval = amy_lab(mData[i], (data[i]).a, (data[i]).b).to_rgb();
-    *it = cv::Vec3b(rval.b, rval.g, rval.r);
+    bmpData.push_back(rval.r);
+    bmpData.push_back(rval.g);
+    bmpData.push_back(rval.b);
   }
 
   if (fname) {
-    cv::imwrite(fname, out_image);
+    writeBMP(fname, mW, mH, bmpData);
   }
 
-  return std::move(out_image);
+  return bmpData;
 }

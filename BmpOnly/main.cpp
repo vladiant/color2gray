@@ -124,17 +124,11 @@ int main(int argc, char** argv) {
           .count();
   std::cout << "c2g completed in " << process_time << " milliseconds\n";
 
-  auto gray_image = dest.save(outname.c_str());
-  auto color_image = dest.saveColor(outname_color.c_str(), initial_image);
+  dest.save(outname.c_str());
+  dest.saveColor(outname_color.c_str(), initial_image);
 
   cv::namedWindow("input", cv::WINDOW_NORMAL);
   cv::imshow("input", source);
-
-  cv::namedWindow("gray", cv::WINDOW_NORMAL);
-  cv::imshow("gray", gray_image);
-
-  cv::namedWindow("color", cv::WINDOW_NORMAL);
-  cv::imshow("color", color_image);
 
   while (true) {
     char ch = cv::waitKey(0);

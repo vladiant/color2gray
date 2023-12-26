@@ -1,6 +1,5 @@
 #pragma once
 
-#include <opencv2/core/mat.hpp>
 #include <vector>
 
 #include "color_image.hpp"
@@ -22,6 +21,6 @@ class GrayImage {
   void complete_solve(const std::vector<float> &d);
   void r_solve(const std::vector<float> &d, int r);
 
-  cv::Mat save(const char *fname) const;
-  cv::Mat saveColor(const char *fname, const ColorImage &source) const;
+  std::vector<uint8_t> save(const char *fname) const;
+  std::vector<uint8_t> saveColor(const char *fname, const ColorImage &source) const;
 };
