@@ -51,10 +51,13 @@ target_include_directories(
     ColorToGrayLib
     PUBLIC
         lib/include/
+        argspp
 )
 
 add_executable(
     ${PROJECT_NAME}
+    argspp/args.h
+    argspp/args.cpp
     main.cpp
 )
 

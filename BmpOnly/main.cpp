@@ -1,7 +1,8 @@
 #include <cmath>
 #include <filesystem>
 #include <iostream>
-#include <opencv2/opencv.hpp>
+#include <charconv>
+#include <args.h>
 
 #include "color_image.hpp"
 #include "gray_image.hpp"
@@ -11,27 +12,36 @@
 
 constexpr auto doc = R"doc(
 color2gray algorithm BMP demo
+--help    print this message
+--theta   Theta
+--alpha   Alpha
+--r       Mu
+--q       Q
 )doc";
 
 constexpr float d2r = M_PI / 180.0;
 constexpr float initial_theta = 3.14 / 6.0;
 
-int main(int argc, char** argv) {
-  cv::String keys =
-      "{help h usage ? |     | print this message   }"
-      "{theta          | " +
-      std::to_string(initial_theta) +
-      "  | Theta  }"
-      "{alpha          | 10.0  | Alpha   }"
-      "{r              |  0  | Mu }"
-      "{q              |     | Q }";
-  cv::CommandLineParser parser(argc, argv, keys);
-  parser.about(doc);
-
-  if (parser.has("help")) {
-    parser.printMessage();
-    return EXIT_SUCCESS;
+float parseString(std::string_view input) {
+  // Expects the pattern identical to the one used by std::strtod in the default
+  // ("C") locale
+  float value{};
+  const auto result = std::from_chars(input.begin(), input.end(), value);
+  if (result.ec != std::errc()) {
+    value = NAN;
   }
+  return value;
+}
+
+int main(int argc, char** argv) {
+  args::ArgParser parser(doc);
+
+  parser.option("theta", std::to_string(initial_theta));
+  parser.option("alpha", "10");
+  parser.option("r", "0");
+  parser.option("q");
+
+  parser.parse(argc, argv);
 
   // Read image
   std::string image_name = "test.ppm";
@@ -49,21 +59,21 @@ int main(int argc, char** argv) {
   }
 
   // Read parameters
-  const auto theta_deg = parser.get<float>("theta");
+  const auto theta_deg = parseString(parser.value("theta"));
   std::cout << "Theta = " << theta_deg << '\n';
   const float theta = theta_deg * d2r;
 
-  const auto alpha = parser.get<float>("alpha");
+  const auto alpha = parseString(parser.value("alpha"));
   std::cout << "Alpha = " << alpha << '\n';
 
-  const int r = parser.get<int>("r");
+  const int r = std::stoi(parser.value("r"));
   std::cout << "mu = " << r << '\n';
 
-  bool quantize = false;
-  int q_colors = parser.get<int>("q");
-  if (parser.has("q")) {
-    quantize = true;
-    std::cout << "q = " << q_colors << '\n';
+  const auto q_value = parser.value("q");
+  bool quantize = !q_value.empty();
+  int q_colors = 0;
+  if (quantize) {
+    q_colors = std::stoi(q_value);
   }
 
   std::cout << "Executing color2gray algorithm on " << image_name
