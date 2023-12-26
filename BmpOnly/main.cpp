@@ -10,7 +10,7 @@
 #include "bitmap.hpp"
 
 constexpr auto doc = R"doc(
-color2gray algorithm OpenCV demo
+color2gray algorithm BMP demo
 )doc";
 
 constexpr float d2r = M_PI / 180.0;
@@ -43,8 +43,7 @@ int main(int argc, char** argv) {
   int sourceHeight;
   const auto sourceData = readBMP(image_name, sourceWidth, sourceHeight);
 
-  cv::Mat source = cv::imread(image_name, cv::IMREAD_COLOR);
-  if (source.empty()) {
+  if (sourceData.empty()) {
     std::cout << "Failed to load file: " << image_name << '\n';
     return EXIT_FAILURE;
   }
@@ -96,11 +95,9 @@ int main(int argc, char** argv) {
   } else {
     if (quantize) {
       const TimeBench bench{"Create a quantized image"};
-      const auto quantized = quantify_image(source, q_colors);
-      initial_image.load_quant_data(quantized);
-
-      // cv::namedWindow("quantized", cv::WINDOW_NORMAL);
-      // cv::imshow("quantized", quantized);
+      // TODO: Fix
+      // const auto quantized = quantify_image(source, q_colors);
+      // initial_image.load_quant_data(quantized);
     }
 
     std::vector<float> d;
@@ -126,16 +123,6 @@ int main(int argc, char** argv) {
 
   dest.save(outname.c_str());
   dest.saveColor(outname_color.c_str(), initial_image);
-
-  cv::namedWindow("input", cv::WINDOW_NORMAL);
-  cv::imshow("input", source);
-
-  while (true) {
-    char ch = cv::waitKey(0);
-    if (ch == 27) {
-      break;
-    }
-  }
 
   return EXIT_SUCCESS;
 }
