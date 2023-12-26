@@ -1,14 +1,15 @@
 #pragma once
 
-#include <opencv2/core/mat.hpp>
 #include <vector>
+#include <cstdint>
 
 #include "amy_lab.hpp"
 
 struct ColorImage {
   ColorImage(float a_theta, float a_alpha, bool a_quantize);
 
-  void load_quant_data(const cv::Mat3b &source);
+  void load_quant_data(const std::vector<uint8_t>& imgData, const int width,
+             const int height);
 
   std::vector<float> calc_d();
 

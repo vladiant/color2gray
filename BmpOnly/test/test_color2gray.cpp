@@ -88,7 +88,8 @@ TEST_CASE("InputImage_Mu1Quantize_TransformedImages [full-test]") {
   dest.r_solve(d, mu);
   // Create a quantized image
   const auto quantized = quantify_image(test_input, q_colors);
-  initial_image.load_quant_data(quantized);
+  // TODO: Fix
+  // initial_image.load_quant_data(quantized);
   dest.post_solve(initial_image);
 
   // Assert

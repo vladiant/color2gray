@@ -62,21 +62,20 @@ void ColorImage::load(const std::vector<uint8_t>& imgData, const int width,
   }
 }
 
-void ColorImage::load_quant_data(const cv::Mat3b &source) {
+void ColorImage::load_quant_data(const std::vector<uint8_t>& imgData, const int width,
+             const int height) {
   using sven::rgb;
 
-  mW = source.cols;
-  mH = source.rows;
+  mW = width;
+  mH = height;
 
   std::vector<rgb> colors;
 
   mData.resize(mN);
 
-  auto it = source.begin();
-  for (int i = 0; i < mN; i++, ++it) {
-    const cv::Vec3b color = *it;
-    colors.emplace_back(color[2], color[1], color[0]);
-    mData[i] = amy_lab(rgb(color[2], color[1], color[0]));
+  for (int i = 0; i < mN; i++) {
+    colors.emplace_back(imgData[3*i], imgData[3*i+1], imgData[3*i+2]);
+    mData[i] = amy_lab(rgb(imgData[3*i], imgData[3*i+1], imgData[3*i+2]));
   }
 
   mN = mW * mH;
