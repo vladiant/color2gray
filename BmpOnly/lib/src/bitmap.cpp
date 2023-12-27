@@ -190,7 +190,7 @@ void writeBMP(const std::string& iname, int width, int height,
   bytes /= height;
   std::vector<uint8_t> scanline(bytes);
   for (int j = 0; j < height; ++j) {
-    memcpy(scanline.data(), &data[j * 3 * width], bytes);
+    memcpy(scanline.data(), &data[j * 3 * width], 3 * width);
     for (int i = 0; i < width; ++i) {
       uint8_t temp = scanline[i * 3];
       scanline[i * 3] = scanline[i * 3 + 2];
