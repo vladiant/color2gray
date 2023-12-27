@@ -15,4 +15,3 @@ std::vector<uint8_t> readBMP(const std::string& fname, int& width, int& height);
 
 void writeBMP(const std::string& iname, int width, int height,
               const std::vector<uint8_t>& data);
-

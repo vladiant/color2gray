@@ -1,14 +1,15 @@
+#include <args.h>
+
+#include <charconv>
 #include <cmath>
 #include <filesystem>
 #include <iostream>
-#include <charconv>
-#include <args.h>
 
+#include "bitmap.hpp"
 #include "color_image.hpp"
 #include "gray_image.hpp"
 #include "time_bench.hpp"
 #include "utils.hpp"
-#include "bitmap.hpp"
 
 constexpr auto doc = R"doc(
 color2gray algorithm BMP demo
@@ -49,7 +50,7 @@ int main(int argc, char** argv) {
   std::string image_name = "test.ppm";
   if (argc > 1) {
     image_name = argv[1];
-  } 
+  }
 
   int sourceWidth;
   int sourceHeight;
@@ -86,7 +87,7 @@ int main(int argc, char** argv) {
 
   // load the image
   ColorImage initial_image(theta, alpha, quantize);
-  initial_image.load(sourceData, sourceWidth,  sourceHeight);
+  initial_image.load(sourceData, sourceWidth, sourceHeight);
   GrayImage dest(initial_image);
 
   const auto start = std::chrono::high_resolution_clock::now();

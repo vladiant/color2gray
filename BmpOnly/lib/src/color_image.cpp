@@ -46,7 +46,7 @@ std::vector<float> ColorImage::r_calc_d(int r) {
 }
 
 void ColorImage::load(const std::vector<uint8_t>& imgData, const int width,
-             const int height) {
+                      const int height) {
   using sven::rgb;
 
   mW = width;
@@ -58,12 +58,13 @@ void ColorImage::load(const std::vector<uint8_t>& imgData, const int width,
   mData.resize(mN);
 
   for (int i = 0; i < mN; i++) {
-    mData[i] = amy_lab(rgb(imgData[3*i], imgData[3*i+1], imgData[3*i+2]));
+    mData[i] =
+        amy_lab(rgb(imgData[3 * i], imgData[3 * i + 1], imgData[3 * i + 2]));
   }
 }
 
-void ColorImage::load_quant_data(const std::vector<uint8_t>& imgData, const int width,
-             const int height) {
+void ColorImage::load_quant_data(const std::vector<uint8_t>& imgData,
+                                 const int width, const int height) {
   using sven::rgb;
 
   mW = width;
@@ -74,8 +75,9 @@ void ColorImage::load_quant_data(const std::vector<uint8_t>& imgData, const int 
   mData.resize(mN);
 
   for (int i = 0; i < mN; i++) {
-    colors.emplace_back(imgData[3*i], imgData[3*i+1], imgData[3*i+2]);
-    mData[i] = amy_lab(rgb(imgData[3*i], imgData[3*i+1], imgData[3*i+2]));
+    colors.emplace_back(imgData[3 * i], imgData[3 * i + 1], imgData[3 * i + 2]);
+    mData[i] =
+        amy_lab(rgb(imgData[3 * i], imgData[3 * i + 1], imgData[3 * i + 2]));
   }
 
   mN = mW * mH;

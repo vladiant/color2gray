@@ -1,31 +1,32 @@
 #include "utils.hpp"
 
-#include <iostream>
 #include <cmath>
+#include <iostream>
 #include <random>
 
 #include "amy_lab.hpp"
 
 namespace {
 
-  /// Random device seed
-  constexpr auto kSeed = 1234;
+/// Random device seed
+constexpr auto kSeed = 1234;
 
-  /// kMeans max iterations
-  constexpr auto kMaxIterations = 20;
+/// kMeans max iterations
+constexpr auto kMaxIterations = 20;
 
-  /// kMeans threashold
-  constexpr auto kEps = 1.0;
+/// kMeans threashold
+constexpr auto kEps = 1.0;
 
-  struct ColorPoint {
-    float R{0.0};
-    float G{0.0};
-    float B{0.0};
-  };
+struct ColorPoint {
+  float R{0.0};
+  float G{0.0};
+  float B{0.0};
+};
 
-} // namespace
+}  // namespace
 
-std::vector<uint8_t> quantify_image(const std::vector<uint8_t>& source, int q_colors) {
+std::vector<uint8_t> quantify_image(const std::vector<uint8_t>& source,
+                                    int q_colors) {
   std::vector<ColorPoint> clusterCenters(q_colors);
 
   // Random generator of color cluster centers
@@ -43,11 +44,14 @@ std::vector<uint8_t> quantify_image(const std::vector<uint8_t>& source, int q_co
     clusterCenters[i].B = distB(gen);
   }
 
-  const auto distance = [](const ColorPoint& lhs, const ColorPoint& rhs){
-    return (lhs.R - rhs.R)*(lhs.R - rhs.R) + (lhs.G - rhs.G)*(lhs.G - rhs.G) + (lhs.B - rhs.B)*(lhs.B - rhs.B);
+  const auto distance = [](const ColorPoint& lhs, const ColorPoint& rhs) {
+    return (lhs.R - rhs.R) * (lhs.R - rhs.R) +
+           (lhs.G - rhs.G) * (lhs.G - rhs.G) +
+           (lhs.B - rhs.B) * (lhs.B - rhs.B);
   };
 
-  const auto getClosestCenterIndex = [&clusterCenters, &distance](const ColorPoint& point){
+  const auto getClosestCenterIndex = [&clusterCenters,
+                                      &distance](const ColorPoint& point) {
     int pos = -1;
     float minDistance = INFINITY;
     for (size_t i = 0; i < clusterCenters.size(); i++) {
@@ -61,33 +65,42 @@ std::vector<uint8_t> quantify_image(const std::vector<uint8_t>& source, int q_co
     return pos;
   };
 
-  std::vector<int> labels(source.size()/3);
-  for(int i = 0; i < kMaxIterations; i++) {
+  std::vector<int> labels(source.size() / 3);
+  for (int i = 0; i < kMaxIterations; i++) {
     // Set label for each point
-    for(size_t i = 0; i < labels.size(); i++) {
-      const ColorPoint currentPoint{.R = static_cast<float>(source[3*i]), .G=static_cast<float>(source[3*i + 1]), .B=static_cast<float>(source[3*i + 2])};
+    for (size_t i = 0; i < labels.size(); i++) {
+      const ColorPoint currentPoint{.R = static_cast<float>(source[3 * i]),
+                                    .G = static_cast<float>(source[3 * i + 1]),
+                                    .B = static_cast<float>(source[3 * i + 2])};
       labels[i] = getClosestCenterIndex(currentPoint);
     }
 
     // Recalculate centers
     std::vector<ColorPoint> newClusterCenters(q_colors);
     std::vector<size_t> labelsCount(q_colors);
-    for(size_t j =0; j < labels.size(); j++) {
+    for (size_t j = 0; j < labels.size(); j++) {
       const auto label = labels[j];
       labelsCount[label] += 1;
-      const auto R = source[3*j];
-      const auto G = source[3*j + 1];
-      const auto B = source[3*j + 2];
+      const auto R = source[3 * j];
+      const auto G = source[3 * j + 1];
+      const auto B = source[3 * j + 2];
       const auto currentLabelCount = labelsCount[label];
-      newClusterCenters[label].R = (newClusterCenters[label].R*(currentLabelCount - 1) + R) / currentLabelCount;
-      newClusterCenters[label].G = (newClusterCenters[label].G*(currentLabelCount - 1) + G) / currentLabelCount;
-      newClusterCenters[label].B = (newClusterCenters[label].B*(currentLabelCount - 1) + B) / currentLabelCount;
+      newClusterCenters[label].R =
+          (newClusterCenters[label].R * (currentLabelCount - 1) + R) /
+          currentLabelCount;
+      newClusterCenters[label].G =
+          (newClusterCenters[label].G * (currentLabelCount - 1) + G) /
+          currentLabelCount;
+      newClusterCenters[label].B =
+          (newClusterCenters[label].B * (currentLabelCount - 1) + B) /
+          currentLabelCount;
     }
 
     // Check distance from old center
     float maxClusterCenterDistance = -INFINITY;
     for (size_t j = 0; j < clusterCenters.size(); j++) {
-      const auto currentDistance = distance(clusterCenters[j], newClusterCenters[j]);
+      const auto currentDistance =
+          distance(clusterCenters[j], newClusterCenters[j]);
       if (currentDistance > maxClusterCenterDistance) {
         maxClusterCenterDistance = currentDistance;
       }
@@ -103,7 +116,7 @@ std::vector<uint8_t> quantify_image(const std::vector<uint8_t>& source, int q_co
   std::vector<uint8_t> points(source.size());
   // Set color points
   for (size_t j = 0; j < source.size();) {
-    const auto currentPoint = clusterCenters[labels[j/3]];
+    const auto currentPoint = clusterCenters[labels[j / 3]];
     points[j++] = currentPoint.R;
     points[j++] = currentPoint.G;
     points[j++] = currentPoint.B;

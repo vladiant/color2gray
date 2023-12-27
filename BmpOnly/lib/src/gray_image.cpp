@@ -71,7 +71,7 @@ std::vector<uint8_t> GrayImage::save(const char *fname) const {
 }
 
 std::vector<uint8_t> GrayImage::saveColor(const char *fname,
-                             const ColorImage &source) const {
+                                          const ColorImage &source) const {
   const auto &data = source.getData();
 
   std::vector<uint8_t> bmpData;

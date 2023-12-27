@@ -22,5 +22,6 @@ class GrayImage {
   void r_solve(const std::vector<float> &d, int r);
 
   std::vector<uint8_t> save(const char *fname) const;
-  std::vector<uint8_t> saveColor(const char *fname, const ColorImage &source) const;
+  std::vector<uint8_t> saveColor(const char *fname,
+                                 const ColorImage &source) const;
 };

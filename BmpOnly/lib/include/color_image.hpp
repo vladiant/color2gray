@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <cstdint>
+#include <vector>
 
 #include "amy_lab.hpp"
 
@@ -9,16 +9,16 @@ struct ColorImage {
   ColorImage(float a_theta, float a_alpha, bool a_quantize);
 
   void load_quant_data(const std::vector<uint8_t>& imgData, const int width,
-             const int height);
+                       const int height);
 
   std::vector<float> calc_d();
 
   std::vector<float> r_calc_d(int r);
 
   void load(const std::vector<uint8_t>& imgData, const int width,
-             const int height);
+            const int height);
 
-  const std::vector<amy_lab> &getData() const { return mData; }
+  const std::vector<amy_lab>& getData() const { return mData; }
 
   int getW() const { return mW; }
   int getH() const { return mH; }
