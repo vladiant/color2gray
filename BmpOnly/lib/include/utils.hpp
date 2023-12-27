@@ -1,6 +1,7 @@
 #pragma once
 
-#include <opencv2/core/mat.hpp>
+#include <cstdint>
+#include <vector>
 
 #include "amy_lab.hpp"
 
@@ -17,7 +18,7 @@ inline float clamp(float x, float x_min, float x_max) {
 
 inline float sq(float s) { return s * s; }
 
-cv::Mat3b quantify_image(const cv::Mat3b& source, int q_colors);
+std::vector<uint8_t> quantify_image(const std::vector<uint8_t>& source, int q_colors);
 
 // Computational functions
 float crunch(float aChromDist, float aAlpha);

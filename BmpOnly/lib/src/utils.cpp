@@ -1,27 +1,113 @@
 #include "utils.hpp"
 
 #include <iostream>
-#include <opencv2/ml.hpp>
+#include <cmath>
+#include <random>
 
 #include "amy_lab.hpp"
 
-cv::Mat3b quantify_image(const cv::Mat3b& source, int q_colors) {
-  cv::Mat points;
-  source.convertTo(points, CV_32F);
-  points = points.reshape(3, source.rows * source.cols);
-  cv::TermCriteria condition(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER,
-                             20, 1.0);
-  cv::Mat labels;
-  cv::Mat centers;
-  cv::kmeans(points, q_colors, labels, condition, 10, cv::KMEANS_RANDOM_CENTERS,
-             centers);
+namespace {
 
-  for (int i = 0; i < points.rows; i++) {
-    points.at<cv::Point3f>(i, 0) =
-        centers.at<cv::Point3f>(labels.at<int>(i, 0), 0);
+  /// Random device seed
+  constexpr auto kSeed = 1234;
+
+  /// kMeans max iterations
+  constexpr auto kMaxIterations = 20;
+
+  /// kMeans threashold
+  constexpr auto kEps = 1.0;
+
+  struct ColorPoint {
+    float R{0.0};
+    float G{0.0};
+    float B{0.0};
+  };
+
+} // namespace
+
+std::vector<uint8_t> quantify_image(const std::vector<uint8_t>& source, int q_colors) {
+  std::vector<ColorPoint> clusterCenters(q_colors);
+
+  // Random generator of color cluster centers
+  std::random_device rd{};
+  std::mt19937 gen{rd()};
+  gen.seed(kSeed);
+
+  std::uniform_real_distribution<float> distR{0, 255};
+  std::uniform_real_distribution<float> distG{0, 255};
+  std::uniform_real_distribution<float> distB{0, 255};
+
+  for (int i = 0; i < q_colors; i++) {
+    clusterCenters[i].R = distR(gen);
+    clusterCenters[i].G = distG(gen);
+    clusterCenters[i].B = distB(gen);
   }
-  points = points.reshape(3, source.rows);
-  points.convertTo(points, CV_8U);
+
+  const auto distance = [](const ColorPoint& lhs, const ColorPoint& rhs){
+    return (lhs.R - rhs.R)*(lhs.R - rhs.R) + (lhs.G - rhs.G)*(lhs.G - rhs.G) + (lhs.B - rhs.B)*(lhs.B - rhs.B);
+  };
+
+  const auto getClosestCenterIndex = [&clusterCenters, &distance](const ColorPoint& point){
+    int pos = -1;
+    float minDistance = INFINITY;
+    for (size_t i = 0; i < clusterCenters.size(); i++) {
+      const auto currentDistance = distance(clusterCenters[i], point);
+      if (currentDistance < minDistance) {
+        minDistance = currentDistance;
+        pos = i;
+      }
+    }
+
+    return pos;
+  };
+
+  std::vector<int> labels(source.size()/3);
+  for(int i = 0; i < kMaxIterations; i++) {
+    // Set label for each point
+    for(size_t i = 0; i < labels.size(); i++) {
+      const ColorPoint currentPoint{.R = static_cast<float>(source[3*i]), .G=static_cast<float>(source[3*i + 1]), .B=static_cast<float>(source[3*i + 2])};
+      labels[i] = getClosestCenterIndex(currentPoint);
+    }
+
+    // Recalculate centers
+    std::vector<ColorPoint> newClusterCenters(q_colors);
+    std::vector<size_t> labelsCount(q_colors);
+    for(size_t j =0; j < labels.size(); j++) {
+      const auto label = labels[j];
+      labelsCount[label] += 1;
+      const auto R = source[3*j];
+      const auto G = source[3*j + 1];
+      const auto B = source[3*j + 2];
+      const auto currentLabelCount = labelsCount[label];
+      newClusterCenters[label].R = (newClusterCenters[label].R*(currentLabelCount - 1) + R) / currentLabelCount;
+      newClusterCenters[label].G = (newClusterCenters[label].G*(currentLabelCount - 1) + G) / currentLabelCount;
+      newClusterCenters[label].B = (newClusterCenters[label].B*(currentLabelCount - 1) + B) / currentLabelCount;
+    }
+
+    // Check distance from old center
+    float maxClusterCenterDistance = -INFINITY;
+    for (size_t j = 0; j < clusterCenters.size(); j++) {
+      const auto currentDistance = distance(clusterCenters[j], newClusterCenters[j]);
+      if (currentDistance > maxClusterCenterDistance) {
+        maxClusterCenterDistance = currentDistance;
+      }
+    }
+
+    clusterCenters.swap(newClusterCenters);
+
+    if (maxClusterCenterDistance < kEps) {
+      break;
+    }
+  }
+
+  std::vector<uint8_t> points(source.size());
+  // Set color points
+  for (size_t j = 0; j < source.size();) {
+    const auto currentPoint = clusterCenters[labels[j/3]];
+    points[j++] = currentPoint.R;
+    points[j++] = currentPoint.G;
+    points[j++] = currentPoint.B;
+  }
 
   return points;
 }

@@ -26,7 +26,7 @@ add_library(
 set_target_properties(
     ColorToGrayLib
     PROPERTIES
-        CXX_STANDARD 17
+        CXX_STANDARD 20
         CXX_STANDARD_REQUIRED YES
         CXX_EXTENSIONS NO
         LINKER_LANGUAGE CXX
@@ -64,7 +64,7 @@ add_executable(
 set_target_properties(
     ${PROJECT_NAME}
     PROPERTIES
-        CXX_STANDARD 17
+        CXX_STANDARD 20
         CXX_STANDARD_REQUIRED YES
         CXX_EXTENSIONS NO
 )
@@ -99,7 +99,7 @@ add_executable(
 set_target_properties(
     TestColor2Gray
     PROPERTIES
-        CXX_STANDARD 17
+        CXX_STANDARD 20
         CXX_STANDARD_REQUIRED YES
         CXX_EXTENSIONS NO
 )

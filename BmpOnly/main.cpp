@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
 
   const auto q_value = parser.value("q");
   bool quantize = !q_value.empty();
-  const int q_colors = quantize ? 0 : std::stoi(q_value);
+  const int q_colors = quantize ? std::stoi(q_value) : 0;
 
   std::cout << "Executing color2gray algorithm on " << image_name
             << " with alpha=" << alpha << ", theta=" << theta_deg << '\n';
@@ -103,10 +103,10 @@ int main(int argc, char** argv) {
     dest.r_solve(d, r);
   } else {
     if (quantize) {
+      std::cout << "q = " << q_colors << '\n';
       const TimeBench bench{"Create a quantized image"};
-      // TODO: Fix
-      // const auto quantized = quantify_image(source, q_colors);
-      // initial_image.load_quant_data(quantized);
+      const auto quantized = quantify_image(sourceData, q_colors);
+      initial_image.load_quant_data(quantized, sourceWidth, sourceHeight);
     }
 
     std::vector<float> d;
