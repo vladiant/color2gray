@@ -77,7 +77,7 @@ void ArgParser::flag(string const& name) {
 
 
 void ArgParser::option(string const& name, string const& fallback) {
-    Option* option = new Option();
+    auto* option = new Option();
     option->fallback = fallback;
     stringstream stream(name);
     string alias;
@@ -121,7 +121,7 @@ string ArgParser::value(string const& name) {
         }
         return options[name]->fallback;
     }
-    return string();
+    return {};
 }
 
 
@@ -129,7 +129,7 @@ vector<string> ArgParser::values(string const& name) {
     if (options.count(name) > 0) {
         return options[name]->values;
     }
-    return vector<string>();
+    return {};
 }
 
 
@@ -143,7 +143,7 @@ ArgParser& ArgParser::command(
     string const& helptext,
     void (*callback)(string cmd_name, ArgParser& cmd_parser)) {
 
-    ArgParser *parser = new ArgParser();
+    auto *parser = new ArgParser();
     parser->helptext = helptext;
     parser->callback = callback;
 

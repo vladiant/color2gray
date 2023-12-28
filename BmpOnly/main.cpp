@@ -52,8 +52,8 @@ int main(int argc, char** argv) {
     image_name = argv[1];
   }
 
-  int sourceWidth;
-  int sourceHeight;
+  int sourceWidth = 0;
+  int sourceHeight = 0;
   const auto sourceData = readBMP(image_name, sourceWidth, sourceHeight);
 
   if (sourceData.empty()) {
