@@ -1,5 +1,7 @@
 #pragma once
 
-#include <opencv2/core.hpp>
+#include <cstdint>
+#include <vector>
 
-void compare_images(const cv::Mat3b& lhs, const cv::Mat3b& rhs);
+void compare_images(const std::vector<uint8_t>& lhs,
+                    const std::vector<uint8_t>& rhs);

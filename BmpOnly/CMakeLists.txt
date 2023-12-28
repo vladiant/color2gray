@@ -1,8 +1,6 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
 
 project(color2gray_bmp)
-
-find_package(OpenCV REQUIRED)
 
 add_library(
     ColorToGrayLib
@@ -41,12 +39,6 @@ target_compile_options(
          $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>
 )
 
-target_link_libraries(
-    ColorToGrayLib
-    PUBLIC
-        ${OpenCV_LIBS}
-)
-
 target_include_directories(
     ColorToGrayLib
     PUBLIC
@@ -79,7 +71,6 @@ target_compile_options(
 target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
-        ${OpenCV_LIBS}
         ColorToGrayLib
 )
 

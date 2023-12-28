@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 
 #include "color_image.hpp"
@@ -16,8 +17,7 @@ TEST_CASE("InputImage_TransformedImages [full-test]") {
   constexpr float theta = 44.977226 * M_PI / 180.0;
 
   ColorImage initial_image(theta, alpha, quantize);
-  // TODO: Fix
-  // initial_image.load(test_input);
+  initial_image.load(test_input, 1, 172);
   GrayImage dest(initial_image);
 
   // Act
@@ -26,15 +26,13 @@ TEST_CASE("InputImage_TransformedImages [full-test]") {
   dest.post_solve(initial_image);
 
   // Assert
-  // TODO: Fix
-  // const auto gray_image = dest.save(nullptr);
+  const auto gray_image = dest.save(nullptr);
   const auto expected_gray_image = full_image::get_expected_gray_image();
-  // compare_images(gray_image, expected_gray_image);
+  compare_images(gray_image, expected_gray_image);
 
-  // TODO: Fix
-  // const auto color_image = dest.saveColor(nullptr, initial_image);
+  const auto color_image = dest.saveColor(nullptr, initial_image);
   const auto expected_color_image = full_image::get_expected_color_image();
-  // compare_images(color_image, expected_color_image);
+  compare_images(color_image, expected_color_image);
 }
 
 TEST_CASE("InputImage_Mu1_TransformedImages [full-test]") {
@@ -47,8 +45,7 @@ TEST_CASE("InputImage_Mu1_TransformedImages [full-test]") {
   constexpr int mu = 10;
 
   ColorImage initial_image(theta, alpha, quantize);
-  // TODO: Fix
-  // initial_image.load(test_input);
+  initial_image.load(test_input, 1, 172);
   GrayImage dest(initial_image);
 
   // Act
@@ -57,15 +54,13 @@ TEST_CASE("InputImage_Mu1_TransformedImages [full-test]") {
   dest.post_solve(initial_image);
 
   // Assert
-  // TODO: Fix
-  // const auto gray_image = dest.save(nullptr);
+  const auto gray_image = dest.save(nullptr);
   const auto expected_gray_image = mu_image::get_expected_gray_image();
-  // compare_images(gray_image, expected_gray_image);
+  compare_images(gray_image, expected_gray_image);
 
-  // TODO: Fix
-  // const auto color_image = dest.saveColor(nullptr, initial_image);
+  const auto color_image = dest.saveColor(nullptr, initial_image);
   const auto expected_color_image = mu_image::get_expected_color_image();
-  // compare_images(color_image, expected_color_image);
+  compare_images(color_image, expected_color_image);
 }
 
 TEST_CASE("InputImage_Mu1Quantize_TransformedImages [full-test]") {
@@ -79,8 +74,7 @@ TEST_CASE("InputImage_Mu1Quantize_TransformedImages [full-test]") {
   constexpr int q_colors = 16;
 
   ColorImage initial_image(theta, alpha, quantize);
-  // TODO: Fix
-  // initial_image.load(test_input);
+  initial_image.load(test_input, 1, 172);
   GrayImage dest(initial_image);
 
   // Act
@@ -88,23 +82,19 @@ TEST_CASE("InputImage_Mu1Quantize_TransformedImages [full-test]") {
   dest.r_solve(d, mu);
   // Create a quantized image
   const auto quantized = quantify_image(test_input, q_colors);
-  // TODO: Fix
-  // initial_image.load_quant_data(quantized);
+  initial_image.load_quant_data(quantized, 1, 172);
   dest.post_solve(initial_image);
 
   // Assert
   const auto expected_quantized =
       quantized_image::get_expected_quantized_image();
-  // TODO: Fix
-  // compare_images(quantized, expected_quantized);
+  compare_images(quantized, expected_quantized);
 
-  // TODO: Fix
-  // const auto gray_image = dest.save(nullptr);
+  const auto gray_image = dest.save(nullptr);
   const auto expected_gray_image = quantized_image::get_expected_gray_image();
-  // compare_images(gray_image, expected_gray_image);
+  compare_images(gray_image, expected_gray_image);
 
-  // TODO: Fix
-  // const auto color_image = dest.saveColor(nullptr, initial_image);
+  const auto color_image = dest.saveColor(nullptr, initial_image);
   const auto expected_color_image = quantized_image::get_expected_color_image();
-  // compare_images(color_image, expected_color_image);
+  compare_images(color_image, expected_color_image);
 }

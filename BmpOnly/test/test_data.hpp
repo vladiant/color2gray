@@ -1,26 +1,27 @@
 #pragma once
 
-#include <opencv2/core.hpp>
+#include <cstdint>
+#include <vector>
 
-cv::Mat get_test_image();
+std::vector<uint8_t> get_test_image();
 
 namespace full_image {
-cv::Mat get_expected_gray_image();
+std::vector<uint8_t> get_expected_gray_image();
 
-cv::Mat get_expected_color_image();
+std::vector<uint8_t> get_expected_color_image();
 }  // namespace full_image
 
 namespace mu_image {
-cv::Mat get_expected_gray_image();
+std::vector<uint8_t> get_expected_gray_image();
 
-cv::Mat get_expected_color_image();
+std::vector<uint8_t> get_expected_color_image();
 }  // namespace mu_image
 
 namespace quantized_image {
 
-cv::Mat get_expected_quantized_image();
+std::vector<uint8_t> get_expected_quantized_image();
 
-cv::Mat get_expected_gray_image();
+std::vector<uint8_t> get_expected_gray_image();
 
-cv::Mat get_expected_color_image();
+std::vector<uint8_t> get_expected_color_image();
 }  // namespace quantized_image
