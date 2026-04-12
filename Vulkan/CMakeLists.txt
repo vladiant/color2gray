@@ -1,0 +1,159 @@
+cmake_minimum_required(VERSION 3.20)
+
+project(color2gray_bmp)
+
+# Find Vulkan SDK
+find_package(Vulkan REQUIRED)
+
+# Find glslc shader compiler
+find_program(GLSLC glslc HINTS $ENV{VULKAN_SDK}/bin)
+if(NOT GLSLC)
+    message(FATAL_ERROR "glslc not found. Install the Vulkan SDK.")
+endif()
+
+# Compile GLSL shaders to SPIR-V
+set(SHADER_DIR ${CMAKE_CURRENT_BINARY_DIR}/shaders)
+file(MAKE_DIRECTORY ${SHADER_DIR})
+
+set(SHADER_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/shaders/calc_d_nq.comp
+    ${CMAKE_CURRENT_SOURCE_DIR}/shaders/calc_d_q.comp
+)
+
+set(SHADER_OUTPUTS)
+foreach(SHADER_SRC ${SHADER_SOURCES})
+    get_filename_component(SHADER_NAME ${SHADER_SRC} NAME_WE)
+    set(SHADER_SPV ${SHADER_DIR}/${SHADER_NAME}.spv)
+    add_custom_command(
+        OUTPUT ${SHADER_SPV}
+        COMMAND ${GLSLC} ${SHADER_SRC} -o ${SHADER_SPV}
+        DEPENDS ${SHADER_SRC}
+        COMMENT "Compiling ${SHADER_NAME}.comp to SPIR-V"
+    )
+    list(APPEND SHADER_OUTPUTS ${SHADER_SPV})
+endforeach()
+
+add_custom_target(compile_shaders DEPENDS ${SHADER_OUTPUTS})
+
+add_library(
+    ColorToGrayLib
+    lib/include/time_bench.hpp
+    lib/src/time_bench.cpp
+    lib/include/bitmap.hpp
+    lib/src/bitmap.cpp
+    lib/include/utils.hpp
+    lib/src/utils.cpp
+    lib/include/rgb.hpp
+    lib/src/amy_xyz.cpp
+    lib/src/amy_xyz.cpp
+    lib/include/amy_lab.hpp
+    lib/src/amy_lab.cpp
+    lib/include/gray_image.hpp
+    lib/src/gray_image.cpp
+    lib/include/color_image.hpp
+    lib/src/color_image.cpp
+    lib/include/vulkan_compute.hpp
+    lib/src/vulkan_compute.cpp
+)
+
+set_target_properties(
+    ColorToGrayLib
+    PROPERTIES
+        CXX_STANDARD 20
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+        LINKER_LANGUAGE CXX
+        SOVERSION 1
+        VERSION 1.0.0
+)
+
+target_compile_options(
+    ColorToGrayLib
+    PRIVATE
+         $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>
+)
+
+target_include_directories(
+    ColorToGrayLib
+    PUBLIC
+        lib/include/
+        argspp
+)
+
+target_link_libraries(
+    ColorToGrayLib
+    PUBLIC
+        Vulkan::Vulkan
+)
+
+target_compile_definitions(
+    ColorToGrayLib
+    PUBLIC
+        SHADER_DIR="${SHADER_DIR}/"
+)
+
+add_dependencies(ColorToGrayLib compile_shaders)
+
+add_executable(
+    ${PROJECT_NAME}
+    argspp/args.h
+    argspp/args.cpp
+    main.cpp
+)
+
+set_target_properties(
+    ${PROJECT_NAME}
+    PROPERTIES
+        CXX_STANDARD 20
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+)
+
+target_compile_options(
+    ${PROJECT_NAME}
+    PRIVATE
+         $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>
+)
+
+target_link_libraries(
+    ${PROJECT_NAME}
+    PRIVATE
+        ColorToGrayLib
+)
+
+# Tests
+include(CTest)
+
+add_executable(
+    TestColor2Gray
+    test/test_data.hpp
+    test/test_data.cpp
+    test/test_utils.hpp
+    test/test_utils.cpp
+    test/test_color2gray.cpp
+    test/main.cpp
+)
+
+set_target_properties(
+    TestColor2Gray
+    PROPERTIES
+        CXX_STANDARD 20
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+)
+
+target_include_directories(
+    TestColor2Gray
+    PRIVATE
+        test
+)
+
+target_link_libraries(
+    TestColor2Gray
+    PRIVATE
+        ColorToGrayLib
+)
+
+add_test(NAME TestColor2Gray COMMAND TestColor2Gray)

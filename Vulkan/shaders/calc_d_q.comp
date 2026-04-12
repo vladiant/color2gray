@@ -1,0 +1,63 @@
+#version 450
+
+layout(local_size_x = 256) in;
+
+layout(std430, binding = 0) readonly buffer LabBuffer {
+    vec4 lab[];  // x=l, y=a, z=b, w=unused
+};
+
+layout(std430, binding = 1) readonly buffer QBuffer {
+    vec4 qlab[];  // x=l, y=a, z=b, w=count
+};
+
+layout(std430, binding = 2) buffer OutputBuffer {
+    float d[];
+};
+
+layout(push_constant) uniform PushConstants {
+    uint N;
+    uint qSize;
+    float theta;
+    float alpha;
+    uint tileStart;
+    uint tileEnd;
+} pc;
+
+float crunch(float chromDist, float a) {
+    return a == 0.0 ? 0.0 : a * tanh(chromDist / a);
+}
+
+void main() {
+    uint idx = gl_GlobalInvocationID.x;
+    if (idx >= pc.N) return;
+
+    vec4 pixelA = lab[idx];
+    float cosTheta = cos(pc.theta);
+    float sinTheta = sin(pc.theta);
+
+    // Kahan compensated summation for this tile
+    float sum = 0.0;
+    float comp = 0.0;
+    for (uint p = pc.tileStart; p < pc.tileEnd; p++) {
+        vec4 pixelB = qlab[p];
+        float count = pixelB.w;
+
+        float dL = pixelA.x - pixelB.x;
+        float da = pixelA.y - pixelB.y;
+        float db = pixelA.z - pixelB.z;
+        float dC = crunch(sqrt(da * da + db * db), pc.alpha);
+
+        float term;
+        if (abs(dL) > dC) {
+            term = count * dL;
+        } else {
+            term = count * dC * ((cosTheta * da + sinTheta * db) > 0.0 ? 1.0 : -1.0);
+        }
+
+        float y = term - comp;
+        float t = sum + y;
+        comp = (t - sum) - y;
+        sum = t;
+    }
+    d[idx] += sum;
+}
