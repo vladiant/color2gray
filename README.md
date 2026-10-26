@@ -40,6 +40,44 @@ Recommended validation procedure:
 
 This check ensures the implementations remain behaviorally consistent even when they use different hardware and programming models.
 
+## Benchmark
+
+The table below compares all backends on the **same input image** using the **same
+parameters**, reporting conversion time, peak host memory, and GPU utilization.
+
+Benchmark configuration:
+
+- Input image: `Lena.bmp` (512 × 512, 24-bit).
+- Parameters: identical Color2Gray defaults across every backend
+  (`theta = 0.523`, `alpha = 10`, `mu = 0` — full-image solve).
+- Time: in-process conversion time reported by the program
+  (`c2g completed in … milliseconds`, excludes image load/save).
+- Memory: peak resident host memory (`/usr/bin/time -v`, maximum RSS).
+- GPU util.: peak GPU compute utilization sampled with `nvidia-smi` during the run
+  (not applicable for CPU-only backends).
+- Machine: NVIDIA GeForce GTX 750 Ti (driver 580.196.07), single run.
+
+| Backend     | Device   | Time (ms) | Peak memory (MB) | GPU util. (%) |
+| ----------- | -------- | --------: | ---------------: | ------------: |
+| BMP         | CPU      |   681 698 |             10.2 | N/A           |
+| OpenCV      | CPU      |   718 382 |             92.7 | N/A           |
+| CUDA        | GPU      |       n/a |              n/a | n/a           |
+| OpenCL      | GPU      |    11 347 |            108.6 | 100           |
+| OpenGL      | GPU      |    12 927 |             71.6 | 100           |
+| OpenGL CS   | GPU      |     8 871 |            126.3 | 100           |
+| Vulkan      | GPU      |     7 162 |             72.2 | 100           |
+
+> **Notes:**
+> - The GPU backends offload the expensive `calc_d` step (an *O(N²)* pairwise
+>   computation) to the device, so they run roughly 50–95× faster than the CPU
+>   backends on this image; `complete_solve` and I/O remain on the host.
+> - OpenCL was run with the `--gpu` flag to select the GPU device; without it the
+>   OpenCL build falls back to the CPU path and performs like the BMP reference.
+> - CUDA is listed as `n/a` because the prebuilt binary targets a newer GPU
+>   architecture than the GTX 750 Ti (`sm_50`) and no CUDA toolkit is installed on
+>   this host to rebuild it; rerun on a supported setup to fill in these cells.
+> - Peak memory is host RSS; GPU-side allocations are not included.
+
 ## Paper
 
 * Title: _Color2Gray: Salience-preserving color removal_
