@@ -226,7 +226,12 @@ bool GLCompute::init() {
 
   glewExperimental = GL_TRUE;
   GLenum glewErr = glewInit();
-  if (glewErr != GLEW_OK) {
+  // On Wayland sessions GLFW creates an EGL context, but a GLX build of GLEW
+  // calls glxewInit() during glewInit() and returns GLEW_ERROR_NO_GLX_DISPLAY
+  // because there is no current GLX display. The core OpenGL function pointers
+  // are still loaded successfully, so this particular error is harmless for a
+  // compute-only workload and must not be treated as fatal.
+  if (glewErr != GLEW_OK && glewErr != GLEW_ERROR_NO_GLX_DISPLAY) {
     std::cerr << "Failed to initialize GLEW: "
               << glewGetErrorString(glewErr) << "\n";
     return false;
