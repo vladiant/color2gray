@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -298,13 +299,44 @@ void renderQuad() {
   glBindVertexArray(0);
 }
 
+const char* envOrUnset(const char* name) {
+  const char* value = std::getenv(name);
+  return value ? value : "<unset>";
+}
+
+void glfwErrorCallback(int code, const char* desc) {
+  std::cerr << "[GLFW] error_code=" << code
+            << " desc=" << (desc ? desc : "<null>") << '\n';
+}
+
+void logLastGlfwError(const char* call) {
+  const char* desc = nullptr;
+  const int code = glfwGetError(&desc);
+  std::cerr << "[GLFW] call=" << call << " err=" << code
+            << " desc=" << (desc ? desc : "<null>") << '\n';
+}
+
+void logGlErrors(const char* stage) {
+  for (GLenum err = glGetError(); err != GL_NO_ERROR; err = glGetError()) {
+    std::cerr << "[GL " << stage << "] error=0x" << std::hex << err
+              << std::dec << '\n';
+  }
+}
+
 }  // namespace
 
 bool GLCompute::init() {
   if (gInitialized) return true;
 
+  glfwSetErrorCallback(glfwErrorCallback);
+  std::cerr << "[ENV] DISPLAY=" << envOrUnset("DISPLAY")
+            << " WAYLAND_DISPLAY=" << envOrUnset("WAYLAND_DISPLAY")
+            << " XDG_SESSION_TYPE=" << envOrUnset("XDG_SESSION_TYPE") << '\n';
+  std::cerr << "[GLFW] runtime=" << glfwGetVersionString() << '\n';
+
   if (!glfwInit()) {
     std::cerr << "GLCompute: Failed to initialize GLFW\n";
+    logLastGlfwError("glfwInit");
     return false;
   }
 
@@ -315,18 +347,46 @@ bool GLCompute::init() {
   gWindow = glfwCreateWindow(1, 1, "GLCompute", nullptr, nullptr);
   if (!gWindow) {
     std::cerr << "GLCompute: Failed to create GLFW window\n";
+    logLastGlfwError("glfwCreateWindow");
     glfwTerminate();
     return false;
   }
   glfwMakeContextCurrent(gWindow);
+  std::cerr << "[GL] VERSION="
+            << (glGetString(GL_VERSION)
+                    ? reinterpret_cast<const char*>(glGetString(GL_VERSION))
+                    : "<null>")
+            << '\n';
+  std::cerr
+      << "[GL] RENDERER="
+      << (glGetString(GL_RENDERER)
+              ? reinterpret_cast<const char*>(glGetString(GL_RENDERER))
+              : "<null>")
+      << '\n';
+  std::cerr << "[GL] VENDOR="
+            << (glGetString(GL_VENDOR)
+                    ? reinterpret_cast<const char*>(glGetString(GL_VENDOR))
+                    : "<null>")
+            << '\n';
+  logGlErrors("pre-glew");
 
   glewExperimental = GL_TRUE;
-  if (glewInit() != GLEW_OK) {
-    std::cerr << "GLCompute: Failed to initialize GLEW\n";
+  const GLenum glewErr = glewInit();
+  if (glewErr != GLEW_OK) {
+    std::cerr << "GLCompute: Failed to initialize GLEW"
+              << " err_code=" << static_cast<unsigned>(glewErr)
+              << " err_str="
+              << reinterpret_cast<const char*>(glewGetErrorString(glewErr))
+              << " glew_ver="
+              << reinterpret_cast<const char*>(glewGetString(GLEW_VERSION))
+              << '\n';
+    logGlErrors("post-glew-fail");
     glfwDestroyWindow(gWindow);
+    gWindow = nullptr;
     glfwTerminate();
     return false;
   }
+  logGlErrors("post-glew-success");
 
   // Clear any GLEW-generated errors
   while (glGetError() != GL_NO_ERROR) {

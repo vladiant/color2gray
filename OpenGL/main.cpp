@@ -2,6 +2,7 @@
 
 #include <charconv>
 #include <cmath>
+#include <cstdlib>
 #include <filesystem>
 #include <iostream>
 
@@ -38,6 +39,11 @@ float parseString(std::string_view input) {
 }
 
 int main(int argc, char** argv) {
+  const bool strict_gl_debug = [] {
+    const char* value = std::getenv("C2G_GL_DEBUG_STRICT");
+    return value != nullptr && std::string_view{value} == "1";
+  }();
+
   args::ArgParser parser(doc);
 
   parser.option("theta", std::to_string(initial_theta));
@@ -65,6 +71,12 @@ int main(int argc, char** argv) {
   // Initialize OpenGL compute
   if (!GLCompute::init()) {
     std::cout << "Warning: OpenGL initialization failed, using CPU fallback\n";
+    if (strict_gl_debug) {
+      std::cerr
+          << "OpenGL init failed (strict debug mode enabled via "
+             "C2G_GL_DEBUG_STRICT=1)\n";
+      return EXIT_FAILURE;
+    }
   }
 
   // Read parameters
