@@ -56,12 +56,15 @@ Benchmark configuration:
 - GPU util.: peak GPU compute utilization sampled with `nvidia-smi` during the run
   (not applicable for CPU-only backends).
 - Machine: NVIDIA GeForce GTX 750 Ti (driver 580.196.07), single run.
+- CUDA was built and run inside a `nvidia/cuda:12.5.1-devel-ubuntu22.04`
+  container (compiled for `sm_50`), since no CUDA toolkit is installed on the
+  host; all other backends ran natively.
 
 | Backend     | Device   | Time (ms) | Peak memory (MB) | GPU util. (%) |
 | ----------- | -------- | --------: | ---------------: | ------------: |
 | BMP         | CPU      |   681 698 |             10.2 | N/A           |
 | OpenCV      | CPU      |   718 382 |             92.7 | N/A           |
-| CUDA        | GPU      |       n/a |              n/a | n/a           |
+| CUDA        | GPU      |     7 962 |             74.7 | 100           |
 | OpenCL      | GPU      |    11 347 |            108.6 | 100           |
 | OpenGL      | GPU      |    12 927 |             71.6 | 100           |
 | OpenGL CS   | GPU      |     8 871 |            126.3 | 100           |
@@ -73,10 +76,31 @@ Benchmark configuration:
 >   backends on this image; `complete_solve` and I/O remain on the host.
 > - OpenCL was run with the `--gpu` flag to select the GPU device; without it the
 >   OpenCL build falls back to the CPU path and performs like the BMP reference.
-> - CUDA is listed as `n/a` because the prebuilt binary targets a newer GPU
->   architecture than the GTX 750 Ti (`sm_50`) and no CUDA toolkit is installed on
->   this host to rebuild it; rerun on a supported setup to fill in these cells.
+> - CUDA cannot be built on this host directly (the stock binary targets a newer
+>   architecture than the GTX 750 Ti's `sm_50` and no CUDA toolkit is installed),
+>   so it was compiled and run with the NVIDIA GPU-enabled Docker image below.
+>   On a host with a matching toolkit it can be built and run natively.
 > - Peak memory is host RSS; GPU-side allocations are not included.
+
+### Running CUDA via Docker
+
+The GTX 750 Ti (compute capability `5.0`, Maxwell) is still supported by the
+CUDA 12.x toolkit (CUDA 13 dropped Maxwell). With Docker and the NVIDIA Container
+Toolkit installed, the CUDA backend can be built and run from the repository root
+without a host-side CUDA install:
+
+```bash
+docker run --rm --gpus all -v "$PWD":/work -w /work/CUDA \
+  nvidia/cuda:12.5.1-devel-ubuntu22.04 bash -c '
+    apt-get update -qq && apt-get install -y -qq cmake build-essential &&
+    cmake -S . -B build-docker -DCMAKE_CUDA_ARCHITECTURES=50 &&
+    cmake --build build-docker -j --target color2gray_bmp &&
+    cp /work/BmpOnly/build/Lena.bmp build-docker/ &&
+    ./build-docker/color2gray_bmp build-docker/Lena.bmp'
+```
+
+Set `-DCMAKE_CUDA_ARCHITECTURES` to match the target GPU (for example `50` for
+Maxwell, `75` for Turing, `86` for Ampere).
 
 ## Paper
 

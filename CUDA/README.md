@@ -51,6 +51,53 @@ cmake --build build -j$(nproc)
 
 Common architecture values: `50` (Maxwell), `61` (Pascal), `75` (Turing), `86` (Ampere), `89` (Ada).
 
+## Building and running with Docker
+
+If the host has no CUDA toolkit installed — or its toolkit no longer supports the
+target GPU (for example CUDA 13 dropped Maxwell / `sm_50`) — the backend can be
+built and run inside an NVIDIA CUDA container instead. This requires:
+
+- [Docker](https://docs.docker.com/engine/install/)
+- The [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+  (so `--gpus all` exposes the GPU to the container)
+
+Pick a `*-devel` image whose CUDA version still supports the GPU's compute
+capability (CUDA 12.x supports Maxwell `sm_50`; CUDA 13 does not).
+
+First, verify the GPU is visible from a container:
+
+```bash
+docker run --rm --gpus all nvidia/cuda:12.5.1-base-ubuntu22.04 nvidia-smi -L
+```
+
+Then build and run the backend from this directory (`CUDA/`). Set
+`-DCMAKE_CUDA_ARCHITECTURES` to match the target GPU (`50` for the GTX 750 Ti):
+
+```bash
+docker run --rm --gpus all -v "$PWD":/work -w /work \
+  nvidia/cuda:12.5.1-devel-ubuntu22.04 bash -c '
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq && apt-get install -y -qq cmake build-essential &&
+    cmake -S . -B build-docker -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_CUDA_ARCHITECTURES=50 &&
+    cmake --build build-docker -j"$(nproc)" --target color2gray_bmp &&
+    ./build-docker/color2gray_bmp your_image.bmp'
+```
+
+Notes:
+
+- The `-v "$PWD":/work` mount makes the build output and any result BMPs appear
+  on the host under `CUDA/build-docker/`. Files created by the container are
+  owned by `root`; use `sudo` (or the cleanup command below) to remove them.
+- To get an interactive shell for repeated builds, drop the `bash -c '…'` and run
+  `… nvidia/cuda:12.5.1-devel-ubuntu22.04 bash`.
+
+Remove the root-owned build directory when finished:
+
+```bash
+docker run --rm -v "$PWD":/work ubuntu:22.04 rm -rf /work/build-docker
+```
+
 ## Usage
 
 ```
