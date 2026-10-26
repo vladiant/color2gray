@@ -334,6 +334,29 @@ bool GLCompute::init() {
             << " XDG_SESSION_TYPE=" << envOrUnset("XDG_SESSION_TYPE") << '\n';
   std::cerr << "[GLFW] runtime=" << glfwGetVersionString() << '\n';
 
+  // GLEW's init path requires a GLX display. On Wayland sessions GLFW would
+  // otherwise select the Wayland/EGL backend, making glewInit() fail with
+  // GLEW_ERROR_NO_GLX_DISPLAY (4). Prefer the X11/GLX backend when it is
+  // available (XWayland provides it on Wayland sessions). This can be
+  // overridden with C2G_GLFW_PLATFORM=wayland|x11|any.
+#if defined(GLFW_PLATFORM) && defined(GLFW_PLATFORM_X11)
+  {
+    const char* platformEnv = std::getenv("C2G_GLFW_PLATFORM");
+    const std::string platform = platformEnv ? platformEnv : "x11";
+    if (platform == "x11" && glfwPlatformSupported(GLFW_PLATFORM_X11)) {
+      glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
+      std::cerr << "[GLFW] forcing platform=x11 (GLX)\n";
+    } else if (platform == "wayland" &&
+               glfwPlatformSupported(GLFW_PLATFORM_WAYLAND)) {
+      glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_WAYLAND);
+      std::cerr << "[GLFW] forcing platform=wayland\n";
+    } else {
+      std::cerr << "[GLFW] using auto-selected platform (requested="
+                << platform << ")\n";
+    }
+  }
+#endif
+
   if (!glfwInit()) {
     std::cerr << "GLCompute: Failed to initialize GLFW\n";
     logLastGlfwError("glfwInit");
